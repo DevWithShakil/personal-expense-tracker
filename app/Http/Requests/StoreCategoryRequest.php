@@ -24,7 +24,7 @@ class StoreCategoryRequest extends FormRequest
                 'max:50',
 
                 Rule::unique('categories')->where(function ($query){
-                    return $query->where('user-id', $this->user()->id)
+                    return $query->where('user_id', $this->user()->id)
                                 ->where('type', $this->type);
                 })
             ],
