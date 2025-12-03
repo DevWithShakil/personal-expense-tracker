@@ -13,7 +13,16 @@ return new class extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('name');
+            $table->string('slug');
+            $table->enum('type', ['income', 'expense']);
+            $table->string('color_code', 7)->default('#E5E7EB');
+            $table->string('icon')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
+
+            $table->unique(['user_id', 'name', 'type']);
         });
     }
 

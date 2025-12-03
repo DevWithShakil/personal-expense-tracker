@@ -12,8 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('transactions', function (Blueprint $table) {
-            $table->id();
+           $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('category_id')->constrained()->cascadeOnDelete();
+            $table->decimal('amount', 12, 2);
+            $table->string('currency', 3)->default('BDT');
+            $table->date('transaction_date');
+            $table->string('description')->nullable();
+            $table->string('attachment')->nullable();
             $table->timestamps();
+            $table->index(['user_id', 'transaction_date']);
+            $table->index(['user_id', 'category_id']);
         });
     }
 
