@@ -27,7 +27,7 @@
     </AppNavbar>
 
     <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <!-- HEADER & FILTER SECTION -->
+      <!-- HEADER & DATE FILTER -->
       <div
         class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4"
       >
@@ -41,11 +41,11 @@
           </p>
         </div>
 
-        <!-- Month Picker Input -->
+        <!-- Month Picker -->
         <div
           class="flex items-center gap-2 bg-white p-2 rounded-lg shadow-sm border border-gray-200"
         >
-          <label class="text-sm text-gray-500 font-medium pl-2">Filter:</label>
+          <label class="text-sm text-gray-500 font-medium pl-2">Period:</label>
           <input
             type="month"
             v-model="filterDate"
@@ -62,11 +62,11 @@
         ></div>
       </div>
 
-      <!-- Dashboard Content -->
+      <!-- Main Content -->
       <div v-else-if="dashboardStats">
-        <!-- TOP STATS CARDS -->
+        <!-- STATS CARDS -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <!-- Total Balance (Always Overall) -->
+          <!-- Total Balance -->
           <div
             class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 relative overflow-hidden md:col-span-1"
           >
@@ -99,9 +99,9 @@
             ></div>
           </div>
 
-          <!-- Income & Expense (Selected Month) -->
+          <!-- Income & Expense Summary -->
           <div class="md:col-span-2 grid grid-cols-2 gap-4">
-            <!-- Income Card -->
+            <!-- Income -->
             <div
               class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex flex-col justify-center"
             >
@@ -129,7 +129,7 @@
               </h3>
             </div>
 
-            <!-- Expense Card -->
+            <!-- Expense -->
             <div
               class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex flex-col justify-center"
             >
@@ -192,19 +192,70 @@
           </div>
         </div>
 
-        <!-- TRANSACTIONS LIST SECTION -->
+        <!-- TRANSACTIONS LIST WITH SEARCH & FILTER -->
         <div
           class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-fit mb-8"
         >
+          <!-- Filter Header (SEARCH BAR HERE) -->
           <div
-            class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50"
+            class="px-6 py-4 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gray-50/50"
           >
-            <h3 class="text-lg font-bold text-gray-800">Transactions</h3>
-            <span
-              class="text-xs text-gray-500 bg-white border px-2 py-1 rounded shadow-sm"
-            >
-              Total: {{ pagination.total }}
-            </span>
+            <div class="flex items-center gap-2">
+              <h3 class="text-lg font-bold text-gray-800">Transactions</h3>
+              <span
+                class="text-xs text-gray-500 bg-white border px-2 py-1 rounded shadow-sm"
+              >
+                Total: {{ pagination.total }}
+              </span>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+              <!-- Type Filters -->
+              <div class="flex bg-white rounded-lg p-1 border shadow-sm">
+                <button
+                  v-for="type in ['all', 'income', 'expense']"
+                  :key="type"
+                  @click="handleTypeFilter(type)"
+                  class="px-3 py-1.5 text-xs font-medium rounded-md capitalize transition-colors"
+                  :class="
+                    filterType === type
+                      ? 'bg-gray-100 text-gray-900 shadow-sm font-bold'
+                      : 'text-gray-500 hover:text-gray-700'
+                  "
+                >
+                  {{ type }}
+                </button>
+              </div>
+
+              <!-- Search Box (THIS IS THE SEARCH BAR) -->
+              <div class="relative">
+                <input
+                  type="text"
+                  v-model="searchQuery"
+                  @input="handleSearch"
+                  placeholder="Search description or category..."
+                  class="pl-9 pr-4 py-1.5 text-sm border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full sm:w-64 border shadow-sm"
+                />
+                <div
+                  class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4 text-gray-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Table Loading -->
@@ -214,6 +265,7 @@
             ></div>
           </div>
 
+          <!-- Transaction Table -->
           <div v-else>
             <div class="overflow-x-auto">
               <table class="w-full text-left">
@@ -288,12 +340,29 @@
                       </button>
                     </td>
                   </tr>
+                  <!-- Empty State -->
                   <tr v-if="transactions.length === 0">
                     <td
                       colspan="5"
-                      class="px-6 py-8 text-center text-gray-400 text-sm"
+                      class="px-6 py-12 text-center text-gray-400 text-sm"
                     >
-                      No transactions found for this month.
+                      <div class="flex flex-col items-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-10 w-10 text-gray-300 mb-2"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                          />
+                        </svg>
+                        <p>No transactions found matching your criteria.</p>
+                      </div>
                     </td>
                   </tr>
                 </tbody>
@@ -448,8 +517,11 @@ const categories = ref([]);
 const showModal = ref(false);
 const submitting = ref(false);
 
-// Date Filter State (YYYY-MM format)
-const filterDate = ref(new Date().toISOString().slice(0, 7));
+// Filter States
+const filterDate = ref(new Date().toISOString().slice(0, 7)); // YYYY-MM
+const searchQuery = ref("");
+const filterType = ref("all");
+let searchTimeout = null; // For Debouncing
 
 const form = reactive({
   amount: "",
@@ -458,12 +530,13 @@ const form = reactive({
   description: "",
 });
 
-// Helper to get year/month from filterDate string
+// Helper: Extract Year/Month
 const getFilterParams = () => {
   const [year, month] = filterDate.value.split("-");
   return { year, month };
 };
 
+// 1. Fetch Stats (Balance, Charts)
 const fetchStats = async () => {
   loadingStats.value = true;
   try {
@@ -477,14 +550,22 @@ const fetchStats = async () => {
   }
 };
 
+// 2. Fetch Transactions List with Filters
 const fetchTransactions = async (page = 1) => {
   loadingTransactions.value = true;
   try {
     const { year, month } = getFilterParams();
-    // Send month/year params to transaction list too
-    const response = await axios.get(
-      `/transactions?page=${page}&year=${year}&month=${month}`
-    );
+
+    // Construct Query Params
+    const params = {
+      page,
+      year,
+      month,
+      type: filterType.value,
+      search: searchQuery.value,
+    };
+
+    const response = await axios.get(`/transactions`, { params });
     transactions.value = response.data.data || [];
 
     if (response.data.meta) {
@@ -507,10 +588,22 @@ const fetchTransactions = async (page = 1) => {
   }
 };
 
-// Called when user changes the month input
+// Event Handlers
+const handleSearch = () => {
+  if (searchTimeout) clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    fetchTransactions(1);
+  }, 500); // 500ms Delay
+};
+
+const handleTypeFilter = (type) => {
+  filterType.value = type;
+  fetchTransactions(1);
+};
+
 const handleFilterChange = () => {
   fetchStats();
-  fetchTransactions(1); // Reset to page 1 on filter change
+  fetchTransactions(1);
 };
 
 const changePage = (page) => {
@@ -519,6 +612,7 @@ const changePage = (page) => {
   }
 };
 
+// Modal & CRUD
 const fetchCategories = async () => {
   try {
     const response = await axios.get("/categories");
@@ -550,7 +644,6 @@ const submitTransaction = async () => {
   try {
     await axios.post("/transactions", form);
     closeModal();
-    // Refresh stats and list
     fetchStats();
     fetchTransactions(1);
   } catch (error) {
