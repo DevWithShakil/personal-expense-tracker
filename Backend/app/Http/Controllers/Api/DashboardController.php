@@ -16,53 +16,23 @@ class DashboardController extends Controller
         $startOfMonth = now()->startOfMonth();
         $endOfMonth = now()->endOfMonth();
 
-
-        $totalIncome = $user->transactions()
-            ->whereHas('category', fn($q) => $q->where('type', 'income'))
-            ->sum('amount');
-
-        $totalExpense = $user->transactions()
-            ->whereHas('category', fn($q) => $q->where('type', 'expense'))
-            ->sum('amount');
-
+        // 1. Balances
+        $totalIncome = $user->transactions()->whereHas('category', fn($q) => $q->where('type', 'income'))->sum('amount');
+        $totalExpense = $user->transactions()->whereHas('category', fn($q) => $q->where('type', 'expense'))->sum('amount');
         $balance = $totalIncome - $totalExpense;
 
+        // 2. This Month
+        $thisMonthIncome = $user->transactions()->whereBetween('transaction_date', [$startOfMonth, $endOfMonth])->whereHas('category', fn($q) => $q->where('type', 'income'))->sum('amount');
+        $thisMonthExpense = $user->transactions()->whereBetween('transaction_date', [$startOfMonth, $endOfMonth])->whereHas('category', fn($q) => $q->where('type', 'expense'))->sum('amount');
 
-        $thisMonthIncome = $user->transactions()
-            ->whereBetween('transaction_date', [$startOfMonth, $endOfMonth])
-            ->whereHas('category', fn($q) => $q->where('type', 'income'))
-            ->sum('amount');
+        // 3. Recent Transactions
+        $recentTransactions = $user->transactions()->with('category')->latest('transaction_date')->limit(5)->get();
 
-        $thisMonthExpense = $user->transactions()
-            ->whereBetween('transaction_date', [$startOfMonth, $endOfMonth])
-            ->whereHas('category', fn($q) => $q->where('type', 'expense'))
-            ->sum('amount');
+        // 4. Expense Chart Data
+        $expenseChart = $this->getChartData($user, 'expense', $startOfMonth, $endOfMonth);
 
-
-        $recentTransactions = $user->transactions()
-            ->with('category')
-            ->latest('transaction_date')
-            ->limit(5)
-            ->get();
-
-
-        $expenseChart = $user->transactions()
-            ->whereBetween('transaction_date', [$startOfMonth, $endOfMonth])
-            ->whereHas('category', fn($q) => $q->where('type', 'expense'))
-            ->select('category_id', DB::raw('sum(amount) as total'))
-            ->with('category:id,name,color_code')
-            ->groupBy('category_id')
-            ->get()
-            ->map(function ($item) {
-
-                return [
-                    'category_name' => $item->category->name,
-                    'color' => $item->category->color_code,
-                    'amount' => (float) $item->total,
-                    'formatted_amount' => '৳' . number_format($item->total, 2)
-                ];
-            });
-
+        // 5. Income Chart Data
+        $incomeChart = $this->getChartData($user, 'income', $startOfMonth, $endOfMonth);
 
         return response()->json([
             'balance' => [
@@ -78,6 +48,27 @@ class DashboardController extends Controller
             ],
             'recent_transactions' => TransactionResource::collection($recentTransactions),
             'expense_chart_data' => $expenseChart,
+            'income_chart_data' => $incomeChart,
         ]);
+    }
+
+    // Helper function to avoid duplicate code
+    private function getChartData($user, $type, $start, $end)
+    {
+        return $user->transactions()
+            ->whereBetween('transaction_date', [$start, $end])
+            ->whereHas('category', fn($q) => $q->where('type', $type))
+            ->select('category_id', DB::raw('sum(amount) as total'))
+            ->with('category:id,name,color_code')
+            ->groupBy('category_id')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'category_name' => $item->category->name,
+                    'color' => $item->category->color_code,
+                    'amount' => (float) $item->total,
+                    'formatted_amount' => '৳' . number_format($item->total, 2)
+                ];
+            });
     }
 }

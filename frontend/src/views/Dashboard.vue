@@ -138,152 +138,169 @@
           </div>
         </div>
 
-        <!-- Charts & Recent Transactions Row -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          <!-- CHART SECTION -->
+        <!-- CHARTS ROW (Income + Expense) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+          <!-- Income Chart -->
           <div
-            class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 lg:col-span-1 h-fit"
+            class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-fit"
           >
-            <h3 class="text-lg font-bold text-gray-800 mb-4">
-              Expense Breakdown
+            <h3
+              class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2"
+            >
+              <span class="w-2 h-6 bg-green-500 rounded-full"></span>
+              Income Breakdown
             </h3>
-            <ExpenseChart :raw-api-data="dashboardStats.expense_chart_data" />
+            <IncomeChart
+              :raw-api-data="dashboardStats.income_chart_data || []"
+            />
           </div>
 
-          <!-- TRANSACTIONS LIST SECTION -->
+          <!-- Expense Chart -->
           <div
-            class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden lg:col-span-2 flex flex-col h-fit"
+            class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-fit"
           >
-            <div
-              class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50"
+            <h3
+              class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2"
             >
-              <h3 class="text-lg font-bold text-gray-800">All Transactions</h3>
-              <span
-                class="text-xs text-gray-500 bg-white border px-2 py-1 rounded shadow-sm"
-              >
-                Total: {{ pagination.total }}
-              </span>
-            </div>
+              <span class="w-2 h-6 bg-red-500 rounded-full"></span>
+              Expense Breakdown
+            </h3>
+            <ExpenseChart
+              :raw-api-data="dashboardStats.expense_chart_data || []"
+            />
+          </div>
+        </div>
 
-            <!-- Table Loading -->
-            <div v-if="loadingTransactions" class="p-12 flex justify-center">
-              <div
-                class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-400"
-              ></div>
-            </div>
+        <!-- TRANSACTIONS LIST SECTION (Full Width) -->
+        <div
+          class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-fit mb-8"
+        >
+          <div
+            class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50"
+          >
+            <h3 class="text-lg font-bold text-gray-800">All Transactions</h3>
+            <span
+              class="text-xs text-gray-500 bg-white border px-2 py-1 rounded shadow-sm"
+            >
+              Total: {{ pagination.total }}
+            </span>
+          </div>
 
-            <div v-else>
-              <div class="overflow-x-auto">
-                <table class="w-full text-left">
-                  <thead
-                    class="bg-gray-50 text-gray-500 text-xs uppercase font-semibold tracking-wider"
+          <!-- Table Loading -->
+          <div v-if="loadingTransactions" class="p-12 flex justify-center">
+            <div
+              class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-400"
+            ></div>
+          </div>
+
+          <div v-else>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left">
+                <thead
+                  class="bg-gray-50 text-gray-500 text-xs uppercase font-semibold tracking-wider"
+                >
+                  <tr>
+                    <th class="px-6 py-3">Date</th>
+                    <th class="px-6 py-3">Description</th>
+                    <th class="px-6 py-3">Category</th>
+                    <th class="px-6 py-3 text-right">Amount</th>
+                    <th class="px-6 py-3 text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                  <tr
+                    v-for="transaction in transactions"
+                    :key="transaction.id"
+                    class="hover:bg-gray-50 transition group"
                   >
-                    <tr>
-                      <th class="px-6 py-3">Date</th>
-                      <th class="px-6 py-3">Description</th>
-                      <th class="px-6 py-3">Category</th>
-                      <th class="px-6 py-3 text-right">Amount</th>
-                      <th class="px-6 py-3 text-center">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-gray-100">
-                    <tr
-                      v-for="transaction in transactions"
-                      :key="transaction.id"
-                      class="hover:bg-gray-50 transition group"
+                    <td
+                      class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap font-medium"
                     >
-                      <td
-                        class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap font-medium"
+                      {{ transaction.date_human }}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-800">
+                      {{ transaction.description || "No description" }}
+                    </td>
+                    <td class="px-6 py-4">
+                      <span
+                        class="px-3 py-1 rounded-full text-xs font-medium flex items-center w-fit gap-1 border border-transparent"
+                        :style="{
+                          backgroundColor:
+                            (transaction.category?.color || '#ccc') + '15',
+                          color: transaction.category?.color || '#666',
+                        }"
                       >
-                        {{ transaction.date_human }}
-                      </td>
-                      <td class="px-6 py-4 text-sm text-gray-800">
-                        {{ transaction.description || "No description" }}
-                      </td>
-                      <td class="px-6 py-4">
-                        <span
-                          class="px-3 py-1 rounded-full text-xs font-medium flex items-center w-fit gap-1 border border-transparent"
-                          :style="{
-                            backgroundColor:
-                              (transaction.category?.color || '#ccc') + '15',
-                            color: transaction.category?.color || '#666',
-                          }"
+                        {{ transaction.category?.name || "Uncategorized" }}
+                      </span>
+                    </td>
+                    <td
+                      class="px-6 py-4 text-sm font-bold text-right whitespace-nowrap"
+                      :class="
+                        transaction.category?.type === 'income'
+                          ? 'text-green-600'
+                          : 'text-red-600'
+                      "
+                    >
+                      {{ transaction.category?.type === "income" ? "+" : "-" }}
+                      {{ transaction.amount_formatted }}
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                      <button
+                        @click="deleteTransaction(transaction.id)"
+                        class="text-gray-400 hover:text-red-500 transition p-1 rounded-md hover:bg-red-50 opacity-0 group-hover:opacity-100"
+                        title="Delete Transaction"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
                         >
-                          {{ transaction.category?.name || "Uncategorized" }}
-                        </span>
-                      </td>
-                      <td
-                        class="px-6 py-4 text-sm font-bold text-right whitespace-nowrap"
-                        :class="
-                          transaction.category?.type === 'income'
-                            ? 'text-green-600'
-                            : 'text-red-600'
-                        "
-                      >
-                        {{
-                          transaction.category?.type === "income" ? "+" : "-"
-                        }}
-                        {{ transaction.amount_formatted }}
-                      </td>
-                      <td class="px-6 py-4 text-center">
-                        <button
-                          @click="deleteTransaction(transaction.id)"
-                          class="text-gray-400 hover:text-red-500 transition p-1 rounded-md hover:bg-red-50 opacity-0 group-hover:opacity-100"
-                          title="Delete Transaction"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="h-4 w-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                            />
-                          </svg>
-                        </button>
-                      </td>
-                    </tr>
-                    <tr v-if="transactions.length === 0">
-                      <td
-                        colspan="5"
-                        class="px-6 py-8 text-center text-gray-400 text-sm"
-                      >
-                        No transactions found.
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr v-if="transactions.length === 0">
+                    <td
+                      colspan="5"
+                      class="px-6 py-8 text-center text-gray-400 text-sm"
+                    >
+                      No transactions found.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
-              <!-- Pagination Controls -->
-              <div
-                v-if="pagination.last_page > 1"
-                class="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50"
+            <!-- Pagination Controls -->
+            <div
+              v-if="pagination.last_page > 1"
+              class="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50"
+            >
+              <button
+                @click="changePage(pagination.current_page - 1)"
+                :disabled="pagination.current_page === 1"
+                class="px-3 py-1 border rounded text-sm text-gray-600 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed bg-white"
               >
-                <button
-                  @click="changePage(pagination.current_page - 1)"
-                  :disabled="pagination.current_page === 1"
-                  class="px-3 py-1 border rounded text-sm text-gray-600 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed bg-white"
-                >
-                  Previous
-                </button>
-                <span class="text-xs text-gray-500 font-medium">
-                  Page {{ pagination.current_page }} of
-                  {{ pagination.last_page }}
-                </span>
-                <button
-                  @click="changePage(pagination.current_page + 1)"
-                  :disabled="pagination.current_page === pagination.last_page"
-                  class="px-3 py-1 border rounded text-sm text-gray-600 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed bg-white"
-                >
-                  Next
-                </button>
-              </div>
+                Previous
+              </button>
+              <span class="text-xs text-gray-500 font-medium">
+                Page {{ pagination.current_page }} of {{ pagination.last_page }}
+              </span>
+              <button
+                @click="changePage(pagination.current_page + 1)"
+                :disabled="pagination.current_page === pagination.last_page"
+                class="px-3 py-1 border rounded text-sm text-gray-600 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed bg-white"
+              >
+                Next
+              </button>
             </div>
           </div>
         </div>
@@ -398,6 +415,7 @@ import { useAuthStore } from "../stores/auth";
 import axios from "../axios";
 import AppNavbar from "../components/AppNavbar.vue";
 import ExpenseChart from "../components/charts/ExpenseChart.vue";
+import IncomeChart from "../components/charts/IncomeChart.vue"; // <--- Import New Component
 
 const authStore = useAuthStore();
 const dashboardStats = ref(null);
@@ -421,7 +439,7 @@ const form = reactive({
   description: "",
 });
 
-// 1. Fetch Dashboard Stats (Balance, Income/Expense, Chart Data)
+// 1. Fetch Dashboard Stats
 const fetchStats = async () => {
   loadingStats.value = true;
   try {
