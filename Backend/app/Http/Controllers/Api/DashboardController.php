@@ -7,6 +7,7 @@ use App\Http\Resources\TransactionResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class DashboardController extends Controller
 {
@@ -80,4 +81,33 @@ class DashboardController extends Controller
                 ];
             });
     }
+
+    public function exportPdf(Request $request)
+{
+    $user = $request->user();
+    $year = $request->input('year', now()->year);
+    $month = $request->input('month', now()->month);
+
+    $startDate = Carbon::createFromDate($year, $month, 1)->startOfMonth();
+    $endDate = Carbon::createFromDate($year, $month, 1)->endOfMonth();
+
+    $transactions = $user->transactions()
+        ->with('category')
+        ->whereBetween('transaction_date', [$startDate, $endDate])
+        ->orderBy('transaction_date', 'asc')
+        ->get();
+    $totalIncome = $transactions->where('category.type', 'income')->sum('amount');
+    $totalExpense = $transactions->where('category.type', 'expense')->sum('amount');
+
+    $pdf = Pdf::loadView('reports.monthly_report', [
+        'user_name' => $user->name,
+        'month_name' => $startDate->format('F Y'),
+        'transactions' => $transactions,
+        'total_income' => number_format($totalIncome, 2),
+        'total_expense' => number_format($totalExpense, 2),
+        'balance' => number_format($totalIncome - $totalExpense, 2),
+    ]);
+
+    return $pdf->download('Monthly_Report_' . $startDate->format('M_Y') . '.pdf');
+}
 }

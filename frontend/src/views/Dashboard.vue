@@ -27,7 +27,7 @@
     </AppNavbar>
 
     <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <!-- HEADER & DATE FILTER -->
+      <!-- HEADER: Title, PDF Button & Filter -->
       <div
         class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4"
       >
@@ -41,17 +41,51 @@
           </p>
         </div>
 
-        <!-- Month Picker -->
-        <div
-          class="flex items-center gap-2 bg-white p-2 rounded-lg shadow-sm border border-gray-200"
-        >
-          <label class="text-sm text-gray-500 font-medium pl-2">Period:</label>
-          <input
-            type="month"
-            v-model="filterDate"
-            @change="handleFilterChange"
-            class="border-none focus:ring-0 text-sm font-medium text-gray-700 bg-transparent cursor-pointer outline-none"
-          />
+        <div class="flex items-center gap-3">
+          <!-- Download PDF Button (NEW) -->
+          <button
+            @click="downloadReport"
+            :disabled="downloading"
+            class="flex items-center gap-2 bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition text-sm font-medium disabled:opacity-50"
+          >
+            <!-- Loading Spinner or Icon -->
+            <svg
+              v-if="!downloading"
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 text-gray-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              />
+            </svg>
+            <div
+              v-else
+              class="animate-spin rounded-full h-4 w-4 border-2 border-gray-500 border-t-transparent"
+            ></div>
+
+            {{ downloading ? "Generating..." : "Download Report" }}
+          </button>
+
+          <!-- Month Picker -->
+          <div
+            class="flex items-center gap-2 bg-white p-2 rounded-lg shadow-sm border border-gray-200"
+          >
+            <label class="text-sm text-gray-500 font-medium pl-2"
+              >Period:</label
+            >
+            <input
+              type="month"
+              v-model="filterDate"
+              @change="handleFilterChange"
+              class="border-none focus:ring-0 text-sm font-medium text-gray-700 bg-transparent cursor-pointer outline-none"
+            />
+          </div>
         </div>
       </div>
 
@@ -196,7 +230,7 @@
         <div
           class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-fit mb-8"
         >
-          <!-- Filter Header (SEARCH BAR HERE) -->
+          <!-- Filter Header -->
           <div
             class="px-6 py-4 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gray-50/50"
           >
@@ -227,7 +261,7 @@
                 </button>
               </div>
 
-              <!-- Search Box (THIS IS THE SEARCH BAR) -->
+              <!-- Search Box -->
               <div class="relative">
                 <input
                   type="text"
@@ -516,12 +550,13 @@ const loadingTransactions = ref(true);
 const categories = ref([]);
 const showModal = ref(false);
 const submitting = ref(false);
+const downloading = ref(false); // PDF Loading State
 
 // Filter States
 const filterDate = ref(new Date().toISOString().slice(0, 7)); // YYYY-MM
 const searchQuery = ref("");
 const filterType = ref("all");
-let searchTimeout = null; // For Debouncing
+let searchTimeout = null;
 
 const form = reactive({
   amount: "",
@@ -585,6 +620,40 @@ const fetchTransactions = async (page = 1) => {
     console.error("Transactions Error:", error);
   } finally {
     loadingTransactions.value = false;
+  }
+};
+
+// 3. Handle PDF Download (Using Blade Backend)
+const downloadReport = async () => {
+  downloading.value = true;
+  try {
+    const { year, month } = getFilterParams();
+
+    // Make request for binary data (blob)
+    const response = await axios.get("/export-pdf", {
+      params: { year, month },
+      responseType: "blob",
+    });
+
+    // Create a temporary URL for the file
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = url;
+
+    // File name format: Report-2025-12.pdf
+    const filename = `Report-${filterDate.value}.pdf`;
+    link.setAttribute("download", filename);
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link); // Clean up
+  } catch (error) {
+    alert(
+      "Failed to download PDF report. Make sure DomPDF is installed in backend."
+    );
+    console.error(error);
+  } finally {
+    downloading.value = false;
   }
 };
 

@@ -21,4 +21,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         return $request->user();
     });
 
+    // PDF Export Route
+    Route::get('export-pdf', [DashboardController::class, 'exportPdf']);
+
 });
