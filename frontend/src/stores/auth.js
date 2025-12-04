@@ -16,13 +16,14 @@ export const useAuthStore = defineStore("auth", {
         async login(formData) {
             try {
                 const response = await axios.post("/login", formData);
-                this.token = response.data.token;
+                this.token = response.data.access_token;
                 this.user = response.data.user;
 
                 localStorage.setItem("token", this.token);
                 localStorage.setItem("user", JSON.stringify(this.user));
-
+                axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`;
                 router.push("/");
+
             } catch (error) {
                 console.error("Login Failed:", error.response.data);
                 throw error;
