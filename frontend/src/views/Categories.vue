@@ -1,5 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div
+    class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300"
+  >
     <!-- Navbar Component -->
     <AppNavbar>
       <template #actions>
@@ -39,7 +41,7 @@
         <div
           v-for="category in categories"
           :key="category.id"
-          class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex justify-between items-center hover:shadow-md transition"
+          class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 flex justify-between items-center hover:shadow-md transition"
         >
           <div class="flex items-center gap-4">
             <!-- Color Box -->
@@ -50,13 +52,15 @@
               {{ category.name.charAt(0) }}
             </div>
             <div>
-              <h3 class="font-bold text-gray-800">{{ category.name }}</h3>
+              <h3 class="font-bold text-gray-800 dark:text-white">
+                {{ category.name }}
+              </h3>
               <span
                 class="text-xs px-2 py-1 rounded-full capitalize"
                 :class="
                   category.type === 'income'
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-red-100 text-red-700'
+                    ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                    : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
                 "
               >
                 {{ category.type }}
@@ -68,7 +72,7 @@
           <div class="flex gap-2">
             <button
               @click="openModal(category)"
-              class="text-gray-400 hover:text-blue-600 p-2 bg-gray-50 rounded-lg"
+              class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -87,7 +91,7 @@
             </button>
             <button
               @click="deleteCategory(category.id)"
-              class="text-gray-400 hover:text-red-600 p-2 bg-gray-50 rounded-lg"
+              class="text-gray-400 hover:text-red-600 dark:hover:text-red-400 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -110,7 +114,7 @@
         <!-- Empty State -->
         <div
           v-if="categories.length === 0"
-          class="col-span-full text-center py-12 text-gray-500"
+          class="col-span-full text-center py-12 text-gray-500 dark:text-gray-400"
         >
           No categories found. Create your first one!
         </div>
@@ -126,10 +130,10 @@
         ></div>
 
         <div
-          class="bg-white rounded-xl overflow-hidden shadow-xl transform transition-all sm:max-w-lg w-full relative z-10"
+          class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-xl transform transition-all sm:max-w-lg w-full relative z-10 border dark:border-gray-700"
         >
-          <div class="px-6 py-6 border-b border-gray-100">
-            <h3 class="text-lg font-bold text-gray-900">
+          <div class="px-6 py-6 border-b border-gray-100 dark:border-gray-700">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white">
               {{ isEditing ? "Edit Category" : "New Category" }}
             </h3>
           </div>
@@ -138,20 +142,22 @@
             <div class="space-y-4">
               <!-- Name -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1"
+                <label
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                   >Category Name</label
                 >
                 <input
                   v-model="form.name"
                   type="text"
                   required
-                  class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 border px-3 py-2"
+                  class="w-full border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 border px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
 
               <!-- Type -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1"
+                <label
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                   >Type</label
                 >
                 <div class="flex gap-4">
@@ -162,7 +168,9 @@
                       value="income"
                       class="text-blue-600 focus:ring-blue-500"
                     />
-                    <span class="text-sm text-gray-700">Income</span>
+                    <span class="text-sm text-gray-700 dark:text-gray-300"
+                      >Income</span
+                    >
                   </label>
                   <label class="flex items-center gap-2 cursor-pointer">
                     <input
@@ -171,25 +179,29 @@
                       value="expense"
                       class="text-red-600 focus:ring-red-500"
                     />
-                    <span class="text-sm text-gray-700">Expense</span>
+                    <span class="text-sm text-gray-700 dark:text-gray-300"
+                      >Expense</span
+                    >
                   </label>
                 </div>
               </div>
 
               <!-- Color Picker -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1"
+                <label
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                   >Color Code</label
                 >
                 <div class="flex items-center gap-3">
                   <input
                     v-model="form.color_code"
                     type="color"
-                    class="h-10 w-20 rounded p-1 border border-gray-300 cursor-pointer"
+                    class="h-10 w-20 rounded p-1 border border-gray-300 dark:border-gray-600 cursor-pointer bg-white dark:bg-gray-700"
                   />
-                  <span class="text-sm text-gray-500 uppercase">{{
-                    form.color_code
-                  }}</span>
+                  <span
+                    class="text-sm text-gray-500 dark:text-gray-400 uppercase"
+                    >{{ form.color_code }}</span
+                  >
                 </div>
               </div>
             </div>
@@ -198,7 +210,7 @@
               <button
                 type="button"
                 @click="closeModal"
-                class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+                class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition"
               >
                 Cancel
               </button>
@@ -236,7 +248,6 @@ const form = reactive({
   icon: "tag",
 });
 
-// Fetch Categories
 const fetchCategories = async () => {
   loading.value = true;
   try {
@@ -249,17 +260,14 @@ const fetchCategories = async () => {
   }
 };
 
-// Open Modal (Add or Edit)
 const openModal = (category = null) => {
   if (category) {
-    // Edit Mode
     isEditing.value = true;
     editingId.value = category.id;
     form.name = category.name;
     form.type = category.type;
     form.color_code = category.color;
   } else {
-    // Add Mode
     isEditing.value = false;
     editingId.value = null;
     resetForm();
@@ -278,7 +286,6 @@ const resetForm = () => {
   form.color_code = "#3b82f6";
 };
 
-// Submit (Create or Update)
 const submitCategory = async () => {
   submitting.value = true;
   try {
@@ -299,7 +306,6 @@ const submitCategory = async () => {
   }
 };
 
-// Delete Category
 const deleteCategory = async (id) => {
   if (
     !confirm(

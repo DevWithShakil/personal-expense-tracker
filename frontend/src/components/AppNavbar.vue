@@ -1,5 +1,7 @@
 <template>
-  <nav class="bg-white shadow-sm border-b sticky top-0 z-20">
+  <nav
+    class="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700 sticky top-0 z-20 transition-colors duration-300"
+  >
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16">
         <!-- Logo & Menu Links -->
@@ -21,7 +23,9 @@
                 />
               </svg>
             </div>
-            <h1 class="text-xl font-bold text-gray-800 hidden sm:block">
+            <h1
+              class="text-xl font-bold text-gray-800 dark:text-white hidden sm:block"
+            >
               Expense Tracker
             </h1>
           </router-link>
@@ -33,8 +37,8 @@
               class="px-3 py-2 rounded-md text-sm font-medium transition"
               :class="
                 $route.path === '/'
-                  ? 'bg-blue-50 text-blue-700'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  ? 'bg-blue-50 text-blue-700 dark:bg-gray-700 dark:text-blue-400'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
               "
             >
               Dashboard
@@ -44,8 +48,8 @@
               class="px-3 py-2 rounded-md text-sm font-medium transition"
               :class="
                 $route.path === '/categories'
-                  ? 'bg-blue-50 text-blue-700'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  ? 'bg-blue-50 text-blue-700 dark:bg-gray-700 dark:text-blue-400'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
               "
             >
               Categories
@@ -58,17 +62,63 @@
           <!-- Page Specific Actions (New Transaction Button comes here) -->
           <slot name="actions"></slot>
 
-          <div class="h-6 w-px bg-gray-300 hidden sm:block"></div>
+          <!-- Dark Mode Toggle -->
+          <button
+            @click="toggleTheme"
+            class="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 transition focus:outline-none"
+            title="Toggle Dark Mode"
+          >
+            <!-- Sun Icon (for Light Mode) -->
+            <svg
+              v-if="isDark"
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+              />
+            </svg>
+            <!-- Moon Icon (for Dark Mode) -->
+            <svg
+              v-else
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+              />
+            </svg>
+          </button>
+
+          <div
+            class="h-6 w-px bg-gray-300 dark:bg-gray-600 hidden sm:block"
+          ></div>
 
           <!-- Profile Dropdown -->
           <div class="relative" ref="dropdownRef">
             <button
               @click="toggleDropdown"
-              class="flex items-center gap-2 focus:outline-none transition-opacity hover:opacity-80 p-1 rounded-full border border-transparent hover:border-gray-200"
+              class="flex items-center gap-2 focus:outline-none transition-opacity hover:opacity-80 p-1 rounded-full border border-transparent hover:border-gray-200 dark:hover:border-gray-600"
             >
               <div class="text-right hidden sm:block mr-1">
-                <p class="text-xs text-gray-500">Logged in as</p>
-                <p class="font-medium text-gray-800 text-sm leading-tight">
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  Logged in as
+                </p>
+                <p
+                  class="font-medium text-gray-800 dark:text-gray-200 text-sm leading-tight"
+                >
                   {{ authStore.user?.name }}
                 </p>
               </div>
@@ -76,7 +126,7 @@
               <!-- Avatar Image -->
               <img
                 :src="avatarUrl"
-                class="h-9 w-9 rounded-full object-cover border border-gray-200 shadow-sm bg-gray-50"
+                class="h-9 w-9 rounded-full object-cover border border-gray-200 dark:border-gray-600 shadow-sm bg-gray-50 dark:bg-gray-700"
                 alt="Profile"
               />
 
@@ -109,14 +159,18 @@
             >
               <div
                 v-if="isOpen"
-                class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-50 origin-top-right"
+                class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 py-1 z-50 origin-top-right"
               >
                 <!-- Mobile User Info (Only visible on small screens) -->
-                <div class="px-4 py-3 border-b border-gray-50 sm:hidden">
-                  <p class="text-sm font-medium text-gray-900 truncate">
+                <div
+                  class="px-4 py-3 border-b border-gray-50 dark:border-gray-700 sm:hidden"
+                >
+                  <p
+                    class="text-sm font-medium text-gray-900 dark:text-white truncate"
+                  >
                     {{ authStore.user?.name }}
                   </p>
-                  <p class="text-xs text-gray-500 truncate">
+                  <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
                     {{ authStore.user?.email }}
                   </p>
                 </div>
@@ -125,7 +179,7 @@
                 <router-link
                   to="/settings"
                   @click="isOpen = false"
-                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition flex items-center gap-2"
+                  class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition flex items-center gap-2"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -153,7 +207,7 @@
                 <!-- Logout Button -->
                 <button
                   @click="handleLogout"
-                  class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition flex items-center gap-2"
+                  class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition flex items-center gap-2"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -189,10 +243,41 @@ const authStore = useAuthStore();
 const router = useRouter();
 const isOpen = ref(false);
 const dropdownRef = ref(null);
+const isDark = ref(false);
 
 const toggleDropdown = () => {
   isOpen.value = !isOpen.value;
 };
+
+// Dark Mode Toggle Logic
+const toggleTheme = () => {
+  isDark.value = !isDark.value;
+  if (isDark.value) {
+    document.documentElement.classList.add("dark");
+    localStorage.setItem("theme", "dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+    localStorage.setItem("theme", "light");
+  }
+};
+
+// Initialize Theme
+onMounted(() => {
+  document.addEventListener("click", closeDropdown);
+
+  // Check local storage or system preference
+  if (
+    localStorage.getItem("theme") === "dark" ||
+    (!("theme" in localStorage) &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches)
+  ) {
+    isDark.value = true;
+    document.documentElement.classList.add("dark");
+  } else {
+    isDark.value = false;
+    document.documentElement.classList.remove("dark");
+  }
+});
 
 // Close dropdown when clicking outside
 const closeDropdown = (e) => {
@@ -200,10 +285,6 @@ const closeDropdown = (e) => {
     isOpen.value = false;
   }
 };
-
-onMounted(() => {
-  document.addEventListener("click", closeDropdown);
-});
 
 onUnmounted(() => {
   document.removeEventListener("click", closeDropdown);

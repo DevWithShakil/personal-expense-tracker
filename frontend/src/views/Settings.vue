@@ -1,23 +1,29 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div
+    class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300"
+  >
     <AppNavbar />
 
     <main class="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
-      <h1 class="text-3xl font-bold text-gray-800 mb-8">Account Settings</h1>
+      <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-8">
+        Account Settings
+      </h1>
 
       <div
-        class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col md:flex-row"
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col md:flex-row"
       >
         <!-- Sidebar -->
-        <div class="w-full md:w-64 bg-gray-50 border-r border-gray-100 p-4">
+        <div
+          class="w-full md:w-64 bg-gray-50 dark:bg-gray-800 border-r border-gray-100 dark:border-gray-700 p-4"
+        >
           <nav class="space-y-1">
             <button
               @click="activeTab = 'profile'"
               class="w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition flex items-center gap-3"
               :class="
                 activeTab === 'profile'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
+                  : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
               "
             >
               <svg
@@ -41,8 +47,8 @@
               class="w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition flex items-center gap-3"
               :class="
                 activeTab === 'password'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
+                  : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
               "
             >
               <svg
@@ -68,7 +74,7 @@
         <div class="flex-1 p-8">
           <!-- TAB 1: PROFILE -->
           <div v-if="activeTab === 'profile'">
-            <h3 class="text-xl font-bold text-gray-800 mb-6">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-6">
               Profile Information
             </h3>
 
@@ -78,7 +84,7 @@
                 <div class="relative group">
                   <img
                     :src="avatarPreview"
-                    class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md bg-gray-100"
+                    class="w-24 h-24 rounded-full object-cover border-4 border-white dark:border-gray-700 shadow-md bg-gray-100 dark:bg-gray-700"
                     alt="Profile Avatar"
                   />
                   <label
@@ -113,10 +119,12 @@
                   </label>
                 </div>
                 <div>
-                  <p class="text-sm font-medium text-gray-700">
+                  <p
+                    class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
                     Profile Picture
                   </p>
-                  <p class="text-xs text-gray-500 mt-1">
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     JPG, GIF or PNG. Max size 2MB.
                   </p>
                 </div>
@@ -125,40 +133,45 @@
               <!-- Input Fields -->
               <div class="grid grid-cols-1 gap-6">
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                  <label
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                     >Full Name</label
                   >
                   <input
                     v-model="profileForm.name"
                     type="text"
                     required
-                    class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 border px-3 py-2"
+                    class="w-full border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 border px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
+
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                  <label
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                     >Email Address</label
                   >
                   <input
                     v-model="profileForm.email"
                     type="email"
                     required
-                    class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 border px-3 py-2"
+                    class="w-full border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 border px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
+
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                  <label
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                     >Currency</label
                   >
                   <select
                     v-model="profileForm.currency"
-                    class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 border px-3 py-2 bg-white"
+                    class="w-full border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 border px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   >
                     <option value="BDT">BDT (৳)</option>
                     <option value="USD">USD ($)</option>
                     <option value="EUR">EUR (€)</option>
                   </select>
-                  <p class="text-xs text-gray-500 mt-1">
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     This will update currency symbol across the app.
                   </p>
                 </div>
@@ -182,47 +195,59 @@
 
           <!-- TAB 2: PASSWORD -->
           <div v-if="activeTab === 'password'">
-            <h3 class="text-xl font-bold text-gray-800 mb-6">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-6">
               Change Password
             </h3>
+
             <form @submit.prevent="changePassword">
               <div class="space-y-5">
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                  <label
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                     >Current Password</label
                   >
                   <input
                     v-model="passwordForm.current_password"
                     type="password"
                     required
-                    class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 border px-3 py-2"
+                    placeholder="Enter current password"
+                    class="w-full border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 border px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
-                <div class="pt-2 border-t border-gray-100"></div>
+
+                <div
+                  class="pt-2 border-t border-gray-100 dark:border-gray-700"
+                ></div>
+
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                  <label
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                     >New Password</label
                   >
                   <input
                     v-model="passwordForm.new_password"
                     type="password"
                     required
-                    placeholder="Min 8 characters"
-                    class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 border px-3 py-2"
+                    placeholder="Enter new password (min 8 chars)"
+                    class="w-full border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 border px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
+
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                  <label
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                     >Confirm New Password</label
                   >
                   <input
                     v-model="passwordForm.new_password_confirmation"
                     type="password"
                     required
-                    class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 border px-3 py-2"
+                    placeholder="Re-enter new password"
+                    class="w-full border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 border px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
               </div>
+
               <div class="mt-8 flex justify-end">
                 <button
                   type="submit"

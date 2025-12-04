@@ -1,6 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <!-- Navbar Component -->
+  <div
+    class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300"
+  >
     <AppNavbar>
       <template #actions>
         <button
@@ -27,31 +28,36 @@
     </AppNavbar>
 
     <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <!-- HEADER: Title, Filters & PDF -->
+      <!-- HEADER -->
       <div
         class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4"
       >
         <div>
-          <h2 class="text-2xl font-bold text-gray-800">Dashboard</h2>
-          <p v-if="dashboardStats" class="text-sm text-gray-500 mt-1">
+          <h2 class="text-2xl font-bold text-gray-800 dark:text-white">
+            Dashboard
+          </h2>
+          <p
+            v-if="dashboardStats"
+            class="text-sm text-gray-500 dark:text-gray-400 mt-1"
+          >
             Overview for
-            <span class="font-semibold text-blue-600">{{
+            <span class="font-semibold text-blue-600 dark:text-blue-400">{{
               dashboardStats.selected_month.name
             }}</span>
           </p>
         </div>
 
         <div class="flex items-center gap-3">
-          <!-- Download PDF Button -->
+          <!-- Download PDF -->
           <button
             @click="downloadReport"
             :disabled="downloading"
-            class="flex items-center gap-2 bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition text-sm font-medium disabled:opacity-50 shadow-sm"
+            class="flex items-center gap-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition text-sm font-medium disabled:opacity-50 shadow-sm"
           >
             <svg
               v-if="!downloading"
               xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4 text-gray-500"
+              class="h-4 w-4 text-gray-500 dark:text-gray-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -72,42 +78,43 @@
 
           <!-- Month Picker -->
           <div
-            class="flex items-center gap-2 bg-white p-2 rounded-lg shadow-sm border border-gray-200"
+            class="flex items-center gap-2 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600"
           >
-            <label class="text-sm text-gray-500 font-medium pl-2"
+            <label
+              class="text-sm text-gray-500 dark:text-gray-400 font-medium pl-2"
               >Period:</label
             >
             <input
               type="month"
               v-model="filterDate"
               @change="handleFilterChange"
-              class="border-none focus:ring-0 text-sm font-medium text-gray-700 bg-transparent cursor-pointer outline-none"
+              class="border-none focus:ring-0 text-sm font-medium text-gray-700 dark:text-gray-200 bg-transparent cursor-pointer outline-none dark:[color-scheme:dark]"
             />
           </div>
         </div>
       </div>
 
-      <!-- Loading State -->
+      <!-- Loading -->
       <div v-if="loadingStats" class="flex justify-center items-center h-64">
         <div
           class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"
         ></div>
       </div>
 
-      <!-- Dashboard Content -->
       <div v-else-if="dashboardStats">
         <!-- STATS CARDS -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <!-- Total Balance -->
           <div
-            class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 relative overflow-hidden md:col-span-1"
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-gray-700 relative overflow-hidden md:col-span-1"
           >
             <div class="relative z-10">
-              <p class="text-sm font-medium text-gray-500 mb-1">
+              <p
+                class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1"
+              >
                 Total Balance (Overall)
               </p>
-              <!-- Dynamic Currency Update -->
-              <h3 class="text-3xl font-bold text-gray-800">
+              <h3 class="text-3xl font-bold text-gray-800 dark:text-white">
                 {{ currencySymbol }} {{ dashboardStats.balance.total }}
               </h3>
               <div class="mt-4 flex items-center text-sm">
@@ -115,8 +122,8 @@
                   class="px-2 py-1 rounded-full text-xs font-medium"
                   :class="
                     dashboardStats.balance.status === 'positive'
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-red-100 text-red-700'
+                      ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                      : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
                   "
                 >
                   {{
@@ -128,19 +135,22 @@
               </div>
             </div>
             <div
-              class="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-50 rounded-full z-0 opacity-50"
+              class="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-50 dark:bg-blue-900/20 rounded-full z-0 opacity-50"
             ></div>
           </div>
 
           <!-- Income & Expense Summary -->
           <div class="md:col-span-2 grid grid-cols-2 gap-4">
-            <!-- Income -->
             <div
-              class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex flex-col justify-center"
+              class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-gray-700 flex flex-col justify-center"
             >
               <div class="flex items-center justify-between mb-1">
-                <p class="text-sm font-medium text-gray-500">Income</p>
-                <div class="p-1.5 bg-green-50 rounded text-green-600">
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  Income
+                </p>
+                <div
+                  class="p-1.5 bg-green-50 dark:bg-green-900/30 rounded text-green-600 dark:text-green-400"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="h-4 w-4"
@@ -157,19 +167,21 @@
                   </svg>
                 </div>
               </div>
-              <!-- Dynamic Currency Update -->
-              <h3 class="text-2xl font-bold text-green-600">
+              <h3 class="text-2xl font-bold text-green-600 dark:text-green-400">
                 {{ currencySymbol }} {{ dashboardStats.selected_month.income }}
               </h3>
             </div>
 
-            <!-- Expense -->
             <div
-              class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex flex-col justify-center"
+              class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-gray-700 flex flex-col justify-center"
             >
               <div class="flex items-center justify-between mb-1">
-                <p class="text-sm font-medium text-gray-500">Expense</p>
-                <div class="p-1.5 bg-red-50 rounded text-red-600">
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  Expense
+                </p>
+                <div
+                  class="p-1.5 bg-red-50 dark:bg-red-900/30 rounded text-red-600 dark:text-red-400"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="h-4 w-4"
@@ -186,8 +198,7 @@
                   </svg>
                 </div>
               </div>
-              <!-- Dynamic Currency Update -->
-              <h3 class="text-2xl font-bold text-red-600">
+              <h3 class="text-2xl font-bold text-red-600 dark:text-red-400">
                 {{ currencySymbol }} {{ dashboardStats.selected_month.expense }}
               </h3>
             </div>
@@ -196,30 +207,28 @@
 
         <!-- CHARTS SECTION -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          <!-- Income Chart -->
           <div
-            class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-fit"
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 h-fit"
           >
             <h3
-              class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2"
+              class="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2"
             >
-              <span class="w-2 h-6 bg-green-500 rounded-full"></span>
-              Income Breakdown
+              <span class="w-2 h-6 bg-green-500 rounded-full"></span> Income
+              Breakdown
             </h3>
             <IncomeChart
               :raw-api-data="dashboardStats.income_chart_data || []"
             />
           </div>
 
-          <!-- Expense Chart -->
           <div
-            class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-fit"
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 h-fit"
           >
             <h3
-              class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2"
+              class="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2"
             >
-              <span class="w-2 h-6 bg-red-500 rounded-full"></span>
-              Expense Breakdown
+              <span class="w-2 h-6 bg-red-500 rounded-full"></span> Expense
+              Breakdown
             </h3>
             <ExpenseChart
               :raw-api-data="dashboardStats.expense_chart_data || []"
@@ -227,26 +236,28 @@
           </div>
         </div>
 
-        <!-- TRANSACTIONS LIST WITH SEARCH & FILTER -->
+        <!-- TRANSACTIONS LIST -->
         <div
-          class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-fit mb-8"
+          class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col h-fit mb-8"
         >
-          <!-- Filter Header -->
           <div
-            class="px-6 py-4 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gray-50/50"
+            class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gray-50/50 dark:bg-gray-700/30"
           >
             <div class="flex items-center gap-2">
-              <h3 class="text-lg font-bold text-gray-800">Transactions</h3>
+              <h3 class="text-lg font-bold text-gray-800 dark:text-white">
+                Transactions
+              </h3>
               <span
-                class="text-xs text-gray-500 bg-white border px-2 py-1 rounded shadow-sm"
+                class="text-xs text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-600 border dark:border-gray-500 px-2 py-1 rounded shadow-sm"
               >
                 Total: {{ pagination.total }}
               </span>
             </div>
 
             <div class="flex flex-col sm:flex-row gap-3">
-              <!-- Type Filters -->
-              <div class="flex bg-white rounded-lg p-1 border shadow-sm">
+              <div
+                class="flex bg-white dark:bg-gray-700 rounded-lg p-1 border dark:border-gray-600 shadow-sm"
+              >
                 <button
                   v-for="type in ['all', 'income', 'expense']"
                   :key="type"
@@ -254,22 +265,21 @@
                   class="px-3 py-1.5 text-xs font-medium rounded-md capitalize transition-colors"
                   :class="
                     filterType === type
-                      ? 'bg-gray-100 text-gray-900 shadow-sm font-bold'
-                      : 'text-gray-500 hover:text-gray-700'
+                      ? 'bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm font-bold'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                   "
                 >
                   {{ type }}
                 </button>
               </div>
 
-              <!-- Search Box -->
               <div class="relative">
                 <input
                   type="text"
                   v-model="searchQuery"
                   @input="handleSearch"
                   placeholder="Search description..."
-                  class="pl-9 pr-4 py-1.5 text-sm border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full sm:w-64 border shadow-sm"
+                  class="pl-9 pr-4 py-1.5 text-sm border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full sm:w-64 border shadow-sm dark:placeholder-gray-400"
                 />
                 <div
                   class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
@@ -293,19 +303,17 @@
             </div>
           </div>
 
-          <!-- Table Loading -->
           <div v-if="loadingTransactions" class="p-12 flex justify-center">
             <div
               class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-400"
             ></div>
           </div>
 
-          <!-- Transaction Table -->
           <div v-else>
             <div class="overflow-x-auto">
               <table class="w-full text-left">
                 <thead
-                  class="bg-gray-50 text-gray-500 text-xs uppercase font-semibold tracking-wider"
+                  class="bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-xs uppercase font-semibold tracking-wider"
                 >
                   <tr>
                     <th class="px-6 py-3">Date</th>
@@ -315,18 +323,20 @@
                     <th class="px-6 py-3 text-center">Action</th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                   <tr
                     v-for="transaction in transactions"
                     :key="transaction.id"
-                    class="hover:bg-gray-50 transition group"
+                    class="hover:bg-gray-50 dark:hover:bg-gray-700 transition group"
                   >
                     <td
-                      class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap font-medium"
+                      class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap font-medium"
                     >
                       {{ transaction.date_human }}
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-800">
+                    <td
+                      class="px-6 py-4 text-sm text-gray-800 dark:text-gray-200"
+                    >
                       {{ transaction.description || "No description" }}
                     </td>
                     <td class="px-6 py-4">
@@ -345,11 +355,10 @@
                       class="px-6 py-4 text-sm font-bold text-right whitespace-nowrap"
                       :class="
                         transaction.category?.type === 'income'
-                          ? 'text-green-600'
-                          : 'text-red-600'
+                          ? 'text-green-600 dark:text-green-400'
+                          : 'text-red-600 dark:text-red-400'
                       "
                     >
-                      <!-- Dynamic Currency in Table -->
                       {{ transaction.category?.type === "income" ? "+" : "-" }}
                       {{ currencySymbol }} {{ transaction.amount }}
                     </td>
@@ -357,11 +366,10 @@
                       <div
                         class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
                       >
-                        <!-- Edit Button -->
                         <button
                           @click="openModal(transaction)"
-                          class="text-gray-400 hover:text-blue-600 transition p-1 rounded-md hover:bg-blue-50"
-                          title="Edit Transaction"
+                          class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition p-1 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                          title="Edit"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -378,12 +386,10 @@
                             />
                           </svg>
                         </button>
-
-                        <!-- Delete Button -->
                         <button
                           @click="deleteTransaction(transaction.id)"
-                          class="text-gray-400 hover:text-red-500 transition p-1 rounded-md hover:bg-red-50"
-                          title="Delete Transaction"
+                          class="text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition p-1 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20"
+                          title="Delete"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -403,17 +409,15 @@
                       </div>
                     </td>
                   </tr>
-
-                  <!-- Empty State -->
                   <tr v-if="transactions.length === 0">
                     <td
                       colspan="5"
-                      class="px-6 py-12 text-center text-gray-400 text-sm"
+                      class="px-6 py-12 text-center text-gray-400 dark:text-gray-500 text-sm"
                     >
                       <div class="flex flex-col items-center">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          class="h-10 w-10 text-gray-300 mb-2"
+                          class="h-10 w-10 text-gray-300 dark:text-gray-600 mb-2"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -425,7 +429,7 @@
                             d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                           />
                         </svg>
-                        <p>No transactions found matching your criteria.</p>
+                        <p>No transactions found.</p>
                       </div>
                     </td>
                   </tr>
@@ -436,22 +440,23 @@
             <!-- Pagination -->
             <div
               v-if="pagination.last_page > 1"
-              class="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50"
+              class="px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between bg-gray-50 dark:bg-gray-700/50"
             >
               <button
                 @click="changePage(pagination.current_page - 1)"
                 :disabled="pagination.current_page === 1"
-                class="px-3 py-1 border rounded text-sm text-gray-600 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed bg-white"
+                class="px-3 py-1 border dark:border-gray-600 rounded text-sm text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-600 disabled:opacity-50 bg-white dark:bg-gray-800"
               >
                 Previous
               </button>
-              <span class="text-xs text-gray-500 font-medium">
-                Page {{ pagination.current_page }} of {{ pagination.last_page }}
-              </span>
+              <span class="text-xs text-gray-500 dark:text-gray-400 font-medium"
+                >Page {{ pagination.current_page }} of
+                {{ pagination.last_page }}</span
+              >
               <button
                 @click="changePage(pagination.current_page + 1)"
                 :disabled="pagination.current_page === pagination.last_page"
-                class="px-3 py-1 border rounded text-sm text-gray-600 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed bg-white"
+                class="px-3 py-1 border dark:border-gray-600 rounded text-sm text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-600 disabled:opacity-50 bg-white dark:bg-gray-800"
               >
                 Next
               </button>
@@ -461,7 +466,7 @@
       </div>
     </main>
 
-    <!-- TRANSACTION MODAL (Add/Edit) -->
+    <!-- MODAL -->
     <div v-if="showModal" class="fixed inset-0 z-50 overflow-y-auto">
       <div
         class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
@@ -471,23 +476,25 @@
           @click="closeModal"
         ></div>
         <div
-          class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full"
+          class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full border dark:border-gray-700"
         >
-          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+          <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <h3
+              class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4"
+            >
               {{ isEditing ? "Edit Transaction" : "Add New Transaction" }}
             </h3>
             <form @submit.prevent="submitTransaction">
               <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1"
+                <label
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                   >Amount</label
                 >
                 <div class="relative rounded-md shadow-sm">
                   <div
                     class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
                   >
-                    <!-- Dynamic Currency Symbol in Modal -->
-                    <span class="text-gray-500 sm:text-sm">{{
+                    <span class="text-gray-500 dark:text-gray-400 sm:text-sm">{{
                       currencySymbol
                     }}</span>
                   </div>
@@ -496,29 +503,31 @@
                     v-model="form.amount"
                     step="0.01"
                     required
-                    class="focus:ring-blue-500 focus:border-blue-500 block w-full pl-7 pr-3 sm:text-sm border-gray-300 rounded-md py-2 border"
+                    class="focus:ring-blue-500 focus:border-blue-500 block w-full pl-7 pr-3 sm:text-sm border-gray-300 dark:border-gray-600 rounded-md py-2 border bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
               </div>
               <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1"
+                <label
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                   >Date</label
                 >
                 <input
                   type="date"
                   v-model="form.transaction_date"
                   required
-                  class="w-full border-gray-300 rounded-md border px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                  class="w-full border-gray-300 dark:border-gray-600 rounded-md border px-3 py-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white dark:[color-scheme:dark]"
                 />
               </div>
               <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1"
+                <label
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                   >Category</label
                 >
                 <select
                   v-model="form.category_id"
                   required
-                  class="w-full border-gray-300 rounded-md border px-3 py-2 bg-white focus:ring-blue-500 focus:border-blue-500"
+                  class="w-full border-gray-300 dark:border-gray-600 rounded-md border px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="" disabled>Select a category</option>
                   <option
@@ -531,13 +540,14 @@
                 </select>
               </div>
               <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1"
+                <label
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                   >Description</label
                 >
                 <textarea
                   v-model="form.description"
                   rows="2"
-                  class="w-full border-gray-300 rounded-md border px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                  class="w-full border-gray-300 dark:border-gray-600 rounded-md border px-3 py-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 ></textarea>
               </div>
               <div
@@ -553,7 +563,7 @@
                 <button
                   type="button"
                   @click="closeModal"
-                  class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:col-start-1 sm:text-sm"
+                  class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 sm:mt-0 sm:col-start-1 sm:text-sm"
                 >
                   Cancel
                 </button>
@@ -585,12 +595,10 @@ const showModal = ref(false);
 const submitting = ref(false);
 const downloading = ref(false);
 
-// Edit States
 const isEditing = ref(false);
 const editId = ref(null);
 
-// Filter States
-const filterDate = ref(new Date().toISOString().slice(0, 7)); // YYYY-MM
+const filterDate = ref(new Date().toISOString().slice(0, 7));
 const searchQuery = ref("");
 const filterType = ref("all");
 let searchTimeout = null;
@@ -602,8 +610,6 @@ const form = reactive({
   description: "",
 });
 
-// Smarter Currency Computed Property
-// ব্যাকএন্ডের রেসপন্সের উপর নির্ভর না করে সরাসরি Auth Store থেকে কারেন্সি চেক করছে
 const currencySymbol = computed(() => {
   const currency = authStore.user?.currency || "BDT";
   switch (currency) {
@@ -618,13 +624,11 @@ const currencySymbol = computed(() => {
   }
 });
 
-// Helper: Extract Year/Month
 const getFilterParams = () => {
   const [year, month] = filterDate.value.split("-");
   return { year, month };
 };
 
-// 1. Fetch Stats
 const fetchStats = async () => {
   loadingStats.value = true;
   try {
@@ -638,13 +642,10 @@ const fetchStats = async () => {
   }
 };
 
-// 2. Fetch Transactions List
 const fetchTransactions = async (page = 1) => {
   loadingTransactions.value = true;
   try {
     const { year, month } = getFilterParams();
-
-    // Construct Query Params
     const params = {
       page,
       year,
@@ -676,7 +677,6 @@ const fetchTransactions = async (page = 1) => {
   }
 };
 
-// 3. Handle PDF Download
 const downloadReport = async () => {
   downloading.value = true;
   try {
@@ -694,14 +694,13 @@ const downloadReport = async () => {
     link.click();
     document.body.removeChild(link);
   } catch (error) {
-    alert("Failed to download PDF. Check backend configuration.");
+    alert("Failed to download PDF.");
     console.error(error);
   } finally {
     downloading.value = false;
   }
 };
 
-// Event Handlers
 const handleSearch = () => {
   if (searchTimeout) clearTimeout(searchTimeout);
   searchTimeout = setTimeout(() => {
@@ -725,7 +724,6 @@ const changePage = (page) => {
   }
 };
 
-// Modal Logic
 const fetchCategories = async () => {
   try {
     const response = await axios.get("/categories");
@@ -739,7 +737,6 @@ const openModal = (transaction = null) => {
   fetchCategories();
 
   if (transaction) {
-    // Edit Mode
     isEditing.value = true;
     editId.value = transaction.id;
     form.amount = transaction.amount;
@@ -747,7 +744,6 @@ const openModal = (transaction = null) => {
     form.category_id = transaction.category ? transaction.category.id : "";
     form.description = transaction.description;
   } else {
-    // Add Mode
     isEditing.value = false;
     editId.value = null;
     resetForm();
