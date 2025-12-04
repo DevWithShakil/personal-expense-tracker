@@ -11,6 +11,9 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
+    /**
+     * Login User
+     */
     public function login(Request $request)
     {
         $request->validate([
@@ -25,6 +28,8 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request->email)->firstOrFail();
+
+
         $user->tokens()->delete();
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -36,7 +41,9 @@ class AuthController extends Controller
         ]);
     }
 
-    //Register Method
+    /**
+     * Register User
+     */
     public function register(Request $request)
     {
         $request->validate([
@@ -53,6 +60,7 @@ class AuthController extends Controller
             $avatarPath = $request->file('avatar')->store('avatars', 'public');
         }
 
+        // Create User
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -61,6 +69,7 @@ class AuthController extends Controller
             'avatar' => $avatarPath,
         ]);
 
+        // Auto Login Token Generation
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -71,6 +80,9 @@ class AuthController extends Controller
         ], 201);
     }
 
+    /**
+     * Logout User
+     */
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();

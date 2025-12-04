@@ -20,50 +20,51 @@ export const useAuthStore = defineStore("auth", {
                 this.user = response.data;
                 localStorage.setItem("user", JSON.stringify(this.user));
             } catch (error) {
-                console.error("Failed to fetch user", error);
                 if (error.response && error.response.status === 401) {
                     this.logout();
                 }
             }
         },
 
-        // 2. Login Action
         async login(formData) {
             try {
                 const response = await axios.post("/login", formData);
-
-                this.token = response.data.access_token;
-                this.user = response.data.user;
-
-                localStorage.setItem("token", this.token);
-                localStorage.setItem("user", JSON.stringify(this.user));
-
-                axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`;
-
+                this.setUserData(response.data);
+                router.push("/");
+            } catch (error) {
+                throw error;
+            }
+        },
+        async register(formData) {
+            try {
+                const response = await axios.post("/register", formData);
+                this.setUserData(response.data);
                 router.push("/");
             } catch (error) {
                 throw error;
             }
         },
 
-        // 3. Logout Action
         async logout() {
             try {
-                if (this.token) {
-                    await axios.post("/logout");
-                }
-            } catch (error) {
-                console.error("Logout error", error);
+                if (this.token) await axios.post("/logout");
             } finally {
                 this.token = null;
                 this.user = null;
                 localStorage.removeItem("token");
                 localStorage.removeItem("user");
-
                 delete axios.defaults.headers.common['Authorization'];
-
                 router.push("/login");
             }
         },
+
+        // Helper to set data
+        setUserData(data) {
+            this.token = data.access_token;
+            this.user = data.user;
+            localStorage.setItem("token", this.token);
+            localStorage.setItem("user", JSON.stringify(this.user));
+            axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`;
+        }
     },
 });
