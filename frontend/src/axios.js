@@ -1,6 +1,8 @@
 import axios from "axios";
 
-axios.defaults.baseURL = "http://127.0.0.1:8000/api";
+const baseURL = import.meta.env.VITE_API_BASE_URL || "https://personal-expense-tracker-uu5h.onrender.com/api";
+
+axios.defaults.baseURL = baseURL;
 
 axios.interceptors.request.use((config) => {
     const token = localStorage.getItem("token");
