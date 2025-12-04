@@ -13,32 +13,46 @@ const router = createRouter({
             path: '/login',
             name: 'login',
             component: Login,
-            meta: { requiresAuth: false }
+            meta: {
+                requiresAuth: false,
+                title: 'Login - Expense Tracker'
+            }
         },
-        // New Registration Route
         {
             path: '/register',
             name: 'register',
             component: Register,
-            meta: { requiresAuth: false }
+            meta: {
+                requiresAuth: false,
+                title: 'Create Account - Expense Tracker'
+            }
         },
         {
             path: '/',
             name: 'dashboard',
             component: Dashboard,
-            meta: { requiresAuth: true }
+            meta: {
+                requiresAuth: true,
+                title: 'Dashboard - Expense Tracker'
+            }
         },
         {
             path: '/categories',
             name: 'categories',
             component: Categories,
-            meta: { requiresAuth: true }
+            meta: {
+                requiresAuth: true,
+                title: 'Categories - Expense Tracker'
+            }
         },
         {
             path: '/settings',
             name: 'settings',
             component: Settings,
-            meta: { requiresAuth: true }
+            meta: {
+                requiresAuth: true,
+                title: 'Settings - Expense Tracker'
+            }
         },
         {
             path: '/:pathMatch(.*)*',
@@ -47,10 +61,14 @@ const router = createRouter({
     ]
 });
 
-// Navigation Guard
+// Navigation Guard & Title Update
 router.beforeEach((to, from, next) => {
     const authStore = useAuthStore();
 
+    // 1. Update Document Title
+    document.title = to.meta.title || 'Expense Tracker';
+
+    // 2. Auth Checks
     if (to.meta.requiresAuth && !authStore.token) {
         next('/login');
     } else if ((to.name === 'login' || to.name === 'register') && authStore.token) {
