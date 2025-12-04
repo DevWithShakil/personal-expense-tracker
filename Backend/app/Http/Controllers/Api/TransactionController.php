@@ -55,6 +55,12 @@ class TransactionController extends Controller
         return new TransactionResource($transaction);
     }
 
+    public function update(Transaction $transaction, StoreTransactionRequest $request)
+    {
+        $transaction->update($request->validated());
+        return new TransactionResource($transaction);
+    }
+
     public function destroy(Transaction $transaction)
     {
         if($transaction->user_id !== auth()->user()->id)

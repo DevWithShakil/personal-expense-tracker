@@ -4,7 +4,7 @@
     <AppNavbar>
       <template #actions>
         <button
-          @click="openModal"
+          @click="openModal()"
           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition shadow-sm flex items-center gap-2 text-sm font-medium"
         >
           <svg
@@ -27,7 +27,7 @@
     </AppNavbar>
 
     <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <!-- HEADER: Title, PDF Button & Filter -->
+      <!-- HEADER: Title, Filters & PDF -->
       <div
         class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4"
       >
@@ -42,13 +42,12 @@
         </div>
 
         <div class="flex items-center gap-3">
-          <!-- Download PDF Button (NEW) -->
+          <!-- Download PDF Button -->
           <button
             @click="downloadReport"
             :disabled="downloading"
-            class="flex items-center gap-2 bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition text-sm font-medium disabled:opacity-50"
+            class="flex items-center gap-2 bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition text-sm font-medium disabled:opacity-50 shadow-sm"
           >
-            <!-- Loading Spinner or Icon -->
             <svg
               v-if="!downloading"
               xmlns="http://www.w3.org/2000/svg"
@@ -68,7 +67,6 @@
               v-else
               class="animate-spin rounded-full h-4 w-4 border-2 border-gray-500 border-t-transparent"
             ></div>
-
             {{ downloading ? "Generating..." : "Download Report" }}
           </button>
 
@@ -96,7 +94,7 @@
         ></div>
       </div>
 
-      <!-- Main Content -->
+      <!-- Dashboard Content -->
       <div v-else-if="dashboardStats">
         <!-- STATS CARDS -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -267,7 +265,7 @@
                   type="text"
                   v-model="searchQuery"
                   @input="handleSearch"
-                  placeholder="Search description or category..."
+                  placeholder="Search description..."
                   class="pl-9 pr-4 py-1.5 text-sm border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full sm:w-64 border shadow-sm"
                 />
                 <div
@@ -352,28 +350,56 @@
                       {{ transaction.amount_formatted }}
                     </td>
                     <td class="px-6 py-4 text-center">
-                      <button
-                        @click="deleteTransaction(transaction.id)"
-                        class="text-gray-400 hover:text-red-500 transition p-1 rounded-md hover:bg-red-50 opacity-0 group-hover:opacity-100"
-                        title="Delete Transaction"
+                      <div
+                        class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="h-4 w-4"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
+                        <!-- Edit Button -->
+                        <button
+                          @click="openModal(transaction)"
+                          class="text-gray-400 hover:text-blue-600 transition p-1 rounded-md hover:bg-blue-50"
+                          title="Edit Transaction"
                         >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
-                      </button>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                            />
+                          </svg>
+                        </button>
+
+                        <!-- Delete Button -->
+                        <button
+                          @click="deleteTransaction(transaction.id)"
+                          class="text-gray-400 hover:text-red-500 transition p-1 rounded-md hover:bg-red-50"
+                          title="Delete Transaction"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                        </button>
+                      </div>
                     </td>
                   </tr>
+
                   <!-- Empty State -->
                   <tr v-if="transactions.length === 0">
                     <td
@@ -431,7 +457,7 @@
       </div>
     </main>
 
-    <!-- ADD TRANSACTION MODAL -->
+    <!-- TRANSACTION MODAL (Add/Edit) -->
     <div v-if="showModal" class="fixed inset-0 z-50 overflow-y-auto">
       <div
         class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
@@ -445,7 +471,7 @@
         >
           <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
-              Add New Transaction
+              {{ isEditing ? "Edit Transaction" : "Add New Transaction" }}
             </h3>
             <form @submit.prevent="submitTransaction">
               <div class="mb-4">
@@ -515,7 +541,7 @@
                   :disabled="submitting"
                   class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 sm:col-start-2 sm:text-sm disabled:opacity-50"
                 >
-                  {{ submitting ? "Saving..." : "Save" }}
+                  {{ submitting ? "Saving..." : isEditing ? "Update" : "Save" }}
                 </button>
                 <button
                   type="button"
@@ -550,7 +576,11 @@ const loadingTransactions = ref(true);
 const categories = ref([]);
 const showModal = ref(false);
 const submitting = ref(false);
-const downloading = ref(false); // PDF Loading State
+const downloading = ref(false);
+
+// Edit States
+const isEditing = ref(false);
+const editId = ref(null);
 
 // Filter States
 const filterDate = ref(new Date().toISOString().slice(0, 7)); // YYYY-MM
@@ -623,34 +653,25 @@ const fetchTransactions = async (page = 1) => {
   }
 };
 
-// 3. Handle PDF Download (Using Blade Backend)
+// 3. Handle PDF Download
 const downloadReport = async () => {
   downloading.value = true;
   try {
     const { year, month } = getFilterParams();
-
-    // Make request for binary data (blob)
     const response = await axios.get("/export-pdf", {
       params: { year, month },
       responseType: "blob",
     });
-
-    // Create a temporary URL for the file
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement("a");
     link.href = url;
-
-    // File name format: Report-2025-12.pdf
     const filename = `Report-${filterDate.value}.pdf`;
     link.setAttribute("download", filename);
-
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link); // Clean up
+    document.body.removeChild(link);
   } catch (error) {
-    alert(
-      "Failed to download PDF report. Make sure DomPDF is installed in backend."
-    );
+    alert("Failed to download PDF. Check backend configuration.");
     console.error(error);
   } finally {
     downloading.value = false;
@@ -662,7 +683,7 @@ const handleSearch = () => {
   if (searchTimeout) clearTimeout(searchTimeout);
   searchTimeout = setTimeout(() => {
     fetchTransactions(1);
-  }, 500); // 500ms Delay
+  }, 500);
 };
 
 const handleTypeFilter = (type) => {
@@ -681,7 +702,7 @@ const changePage = (page) => {
   }
 };
 
-// Modal & CRUD
+// Modal Logic
 const fetchCategories = async () => {
   try {
     const response = await axios.get("/categories");
@@ -691,8 +712,24 @@ const fetchCategories = async () => {
   }
 };
 
-const openModal = () => {
+const openModal = (transaction = null) => {
   fetchCategories();
+
+  if (transaction) {
+    // Edit Mode
+    isEditing.value = true;
+    editId.value = transaction.id;
+    form.amount = transaction.amount;
+    form.transaction_date = transaction.date;
+    form.category_id = transaction.category ? transaction.category.id : "";
+    form.description = transaction.description;
+  } else {
+    // Add Mode
+    isEditing.value = false;
+    editId.value = null;
+    resetForm();
+  }
+
   showModal.value = true;
 };
 
@@ -711,12 +748,16 @@ const resetForm = () => {
 const submitTransaction = async () => {
   submitting.value = true;
   try {
-    await axios.post("/transactions", form);
+    if (isEditing.value) {
+      await axios.put(`/transactions/${editId.value}`, form);
+    } else {
+      await axios.post("/transactions", form);
+    }
     closeModal();
     fetchStats();
-    fetchTransactions(1);
+    fetchTransactions(isEditing.value ? pagination.value.current_page : 1);
   } catch (error) {
-    alert("Error adding transaction.");
+    alert("Error saving transaction.");
   } finally {
     submitting.value = false;
   }

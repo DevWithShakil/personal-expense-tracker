@@ -13,7 +13,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::apiResource('categories', CategoryController::class);
     Route::apiResource('transactions', TransactionController::class)
-        ->only(['index', 'store', 'destroy']);
+        ->only(['index', 'store','update', 'destroy']);
 
     Route::get('dashboard', [DashboardController::class, 'index']);
     Route::post('/logout', [AuthController::class, 'logout']);
