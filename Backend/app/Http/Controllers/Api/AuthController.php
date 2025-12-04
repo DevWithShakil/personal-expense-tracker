@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -23,7 +25,6 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request->email)->firstOrFail();
-
         $user->tokens()->delete();
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -35,10 +36,44 @@ class AuthController extends Controller
         ]);
     }
 
+    //Register Method
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'currency' => ['required', 'string', 'max:3'],
+            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+        ]);
+
+        // Handle Avatar Upload
+        $avatarPath = null;
+        if ($request->hasFile('avatar')) {
+            $avatarPath = $request->file('avatar')->store('avatars', 'public');
+        }
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'currency' => $request->currency,
+            'avatar' => $avatarPath,
+        ]);
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Registration successful',
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $user
+        ], 201);
+    }
+
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
-
         return response()->json(['message' => 'Logged out successfully']);
     }
 }

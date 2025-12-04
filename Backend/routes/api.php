@@ -14,7 +14,10 @@ use App\Http\Controllers\Api\UserController;
 |--------------------------------------------------------------------------
 */
 
-// Public Route
+// Registration Route
+Route::post('/register', [AuthController::class, 'register']);
+
+// Login Route
 Route::post('/login', [AuthController::class, 'login']);
 
 // Protected Routes
