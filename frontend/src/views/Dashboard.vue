@@ -355,15 +355,33 @@
           >
             <div class="flex items-center gap-3 mb-6 md:mb-8">
               <div
-                class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center"
+                class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center border border-emerald-200 dark:border-emerald-800"
               >
-                <span class="text-lg md:text-xl">💰</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-6 w-6 text-emerald-600 dark:text-emerald-400"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+                  />
+                </svg>
               </div>
-              <h3
-                class="text-lg md:text-xl font-black text-gray-800 dark:text-white"
-              >
-                Income Sources
-              </h3>
+              <div>
+                <h3
+                  class="text-lg md:text-xl font-black text-gray-800 dark:text-white"
+                >
+                  Income Sources
+                </h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                  Where your money comes from
+                </p>
+              </div>
             </div>
             <IncomeChart
               :raw-api-data="dashboardStats.income_chart_data || []"
@@ -376,15 +394,33 @@
           >
             <div class="flex items-center gap-3 mb-6 md:mb-8">
               <div
-                class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center"
+                class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center border border-rose-200 dark:border-rose-800"
               >
-                <span class="text-lg md:text-xl">💸</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-6 w-6 text-rose-600 dark:text-rose-400"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M2 6h20M4 6l2 13a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l2-13M10 11v6M14 11v6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                  />
+                </svg>
               </div>
-              <h3
-                class="text-lg md:text-xl font-black text-gray-800 dark:text-white"
-              >
-                Expense Structure
-              </h3>
+              <div>
+                <h3
+                  class="text-lg md:text-xl font-black text-gray-800 dark:text-white"
+                >
+                  Expense Structure
+                </h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                  Where your money goes
+                </p>
+              </div>
             </div>
             <ExpenseChart
               :raw-api-data="dashboardStats.expense_chart_data || []"
@@ -510,13 +546,15 @@
           </div>
 
           <!-- Loading -->
-          <div
-            v-if="loadingTransactions"
-            class="p-12 md:p-20 flex justify-center"
-          >
-            <div
-              class="animate-spin rounded-full h-8 w-8 md:h-10 md:w-10 border-4 border-gray-200 border-t-blue-600"
-            ></div>
+          <div v-if="loadingTransactions" class="p-20 flex justify-center">
+            <div class="relative">
+              <div
+                class="w-12 h-12 border-4 border-gray-200 rounded-full"
+              ></div>
+              <div
+                class="w-12 h-12 border-4 border-blue-600 rounded-full border-t-transparent animate-spin absolute top-0 left-0"
+              ></div>
+            </div>
           </div>
 
           <div v-else>
@@ -539,7 +577,7 @@
                     :key="transaction.id"
                     class="group hover:bg-blue-50/40 dark:hover:bg-blue-900/10 transition-colors duration-200"
                   >
-                    <!-- Same Desktop Columns as before -->
+                    <!-- Description & Date -->
                     <td class="px-8 py-5">
                       <div class="flex flex-col">
                         <span
@@ -551,10 +589,26 @@
                         <div
                           class="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400"
                         >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-3.5 w-3.5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                          </svg>
                           {{ transaction.date_human }}
                         </div>
                       </div>
                     </td>
+
+                    <!-- Category Pill -->
                     <td class="px-8 py-5">
                       <div
                         class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm"
@@ -573,6 +627,8 @@
                         </span>
                       </div>
                     </td>
+
+                    <!-- Amount -->
                     <td class="px-8 py-5 text-right">
                       <span
                         class="text-base font-black px-4 py-1.5 rounded-full inline-block min-w-[100px] text-center"
@@ -588,13 +644,16 @@
                         {{ currencySymbol }}{{ transaction.amount }}
                       </span>
                     </td>
+
+                    <!-- Actions -->
                     <td class="px-8 py-5 text-center">
                       <div
-                        class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200"
+                        class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200 translate-x-2 group-hover:translate-x-0"
                       >
                         <button
                           @click="openModal(transaction)"
                           class="p-2.5 rounded-xl text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition"
+                          title="Edit"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -614,6 +673,7 @@
                         <button
                           @click="deleteTransaction(transaction.id)"
                           class="p-2.5 rounded-xl text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 transition"
+                          title="Delete"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -633,6 +693,39 @@
                       </div>
                     </td>
                   </tr>
+
+                  <tr v-if="transactions.length === 0">
+                    <td colspan="4" class="px-6 py-20 text-center">
+                      <div class="flex flex-col items-center">
+                        <div
+                          class="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-6 shadow-inner"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-10 w-10 text-gray-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                            />
+                          </svg>
+                        </div>
+                        <h3 class="text-gray-900 dark:text-white font-medium">
+                          No transactions found
+                        </h3>
+                        <p
+                          class="text-gray-500 dark:text-gray-400 text-sm mt-1"
+                        >
+                          Try adjusting your filters or add a new one.
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -642,7 +735,7 @@
               <div
                 v-for="transaction in transactions"
                 :key="transaction.id"
-                class="bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm relative overflow-hidden"
+                class="bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm relative overflow-hidden active:scale-95 transition-transform"
               >
                 <div
                   class="absolute top-0 left-0 w-1 h-full"
@@ -658,7 +751,23 @@
                     <h4 class="font-bold text-gray-900 dark:text-white text-lg">
                       {{ transaction.description || "No description" }}
                     </h4>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <p
+                      class="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-3 w-3"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
                       {{ transaction.date_human }}
                     </p>
                   </div>
@@ -694,7 +803,7 @@
                   <div class="flex gap-1">
                     <button
                       @click="openModal(transaction)"
-                      class="p-2 text-gray-400 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:text-blue-600"
+                      class="p-2 text-gray-400 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:text-blue-600 active:bg-blue-100"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -713,7 +822,7 @@
                     </button>
                     <button
                       @click="deleteTransaction(transaction.id)"
-                      class="p-2 text-gray-400 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:text-rose-600"
+                      class="p-2 text-gray-400 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:text-rose-600 active:bg-rose-100"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -735,8 +844,11 @@
               </div>
             </div>
 
-            <!-- Empty State -->
-            <div v-if="transactions.length === 0" class="p-12 text-center">
+            <!-- Empty State Mobile -->
+            <div
+              v-if="transactions.length === 0"
+              class="p-12 text-center md:hidden"
+            >
               <div class="flex flex-col items-center">
                 <div
                   class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4"
@@ -770,21 +882,53 @@
               <button
                 @click="changePage(pagination.current_page - 1)"
                 :disabled="pagination.current_page === 1"
-                class="flex items-center gap-1 px-3 py-2 md:px-4 md:py-2 text-xs md:text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg disabled:opacity-50"
+                class="flex items-center gap-1 px-3 py-2 md:px-4 md:py-2 text-xs md:text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
               >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
                 Previous
               </button>
               <span
                 class="text-xs md:text-sm text-gray-600 dark:text-gray-400 font-medium"
               >
-                Page {{ pagination.current_page }} / {{ pagination.last_page }}
+                Page
+                <span class="font-bold text-gray-900 dark:text-white">{{
+                  pagination.current_page
+                }}</span>
+                of {{ pagination.last_page }}
               </span>
               <button
                 @click="changePage(pagination.current_page + 1)"
                 :disabled="pagination.current_page === pagination.last_page"
-                class="flex items-center gap-1 px-3 py-2 md:px-4 md:py-2 text-xs md:text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg disabled:opacity-50"
+                class="flex items-center gap-1 px-3 py-2 md:px-4 md:py-2 text-xs md:text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
               >
                 Next
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
               </button>
             </div>
           </div>
@@ -917,7 +1061,7 @@
                 <button
                   type="submit"
                   :disabled="submitting"
-                  class="flex-1 sm:flex-none px-6 md:px-8 py-3 md:py-3.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold disabled:opacity-70 text-sm md:text-base"
+                  class="flex-1 sm:flex-none px-6 md:px-8 py-3 md:py-3.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl hover:shadow-lg hover:shadow-gray-900/20 font-bold transition-all transform hover:-translate-y-0.5 disabled:opacity-70 disabled:transform-none text-sm md:text-base"
                 >
                   {{ submitting ? "Saving..." : isEditing ? "Update" : "Save" }}
                 </button>
