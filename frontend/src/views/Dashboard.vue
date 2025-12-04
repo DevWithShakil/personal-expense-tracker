@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <!-- Navbar Replaced with Component -->
+    <!-- Navbar Component -->
     <AppNavbar>
       <template #actions>
         <button
@@ -26,9 +26,8 @@
       </template>
     </AppNavbar>
 
-    <!-- Main Content -->
     <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <!-- Stats Loading State -->
+      <!-- Loading State -->
       <div
         v-if="loadingStats"
         class="flex justify-center items-center h-32 mb-8"
@@ -38,192 +37,254 @@
         ></div>
       </div>
 
-      <!-- Stats Cards -->
-      <div
-        v-else-if="dashboardStats"
-        class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
-      >
-        <!-- Total Balance -->
-        <div
-          class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 relative overflow-hidden"
-        >
-          <div class="relative z-10">
-            <p class="text-sm font-medium text-gray-500 mb-1">Total Balance</p>
-            <h3 class="text-3xl font-bold text-gray-800">
-              {{ dashboardStats.balance.formatted }}
-            </h3>
-            <div class="mt-4 flex items-center text-sm">
-              <span
-                class="px-2 py-1 rounded-full text-xs font-medium"
-                :class="
-                  dashboardStats.balance.status === 'positive'
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-red-100 text-red-700'
-                "
-              >
-                {{
-                  dashboardStats.balance.status === "positive"
-                    ? "Healthy"
-                    : "Overdraft"
-                }}
-              </span>
+      <!-- Dashboard Content -->
+      <div v-else-if="dashboardStats">
+        <!-- Top Stats Row -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <!-- Total Balance Card -->
+          <div
+            class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 relative overflow-hidden md:col-span-1"
+          >
+            <div class="relative z-10">
+              <p class="text-sm font-medium text-gray-500 mb-1">
+                Total Balance
+              </p>
+              <h3 class="text-3xl font-bold text-gray-800">
+                {{ dashboardStats.balance.formatted }}
+              </h3>
+              <div class="mt-4 flex items-center text-sm">
+                <span
+                  class="px-2 py-1 rounded-full text-xs font-medium"
+                  :class="
+                    dashboardStats.balance.status === 'positive'
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-red-100 text-red-700'
+                  "
+                >
+                  {{
+                    dashboardStats.balance.status === "positive"
+                      ? "Healthy"
+                      : "Overdraft"
+                  }}
+                </span>
+              </div>
+            </div>
+            <div
+              class="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-50 rounded-full z-0 opacity-50"
+            ></div>
+          </div>
+
+          <!-- Income & Expense Summary -->
+          <div class="md:col-span-2 grid grid-cols-2 gap-4">
+            <!-- Income Card -->
+            <div
+              class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex flex-col justify-center"
+            >
+              <div class="flex items-center justify-between mb-1">
+                <p class="text-sm font-medium text-gray-500">
+                  Income (This Month)
+                </p>
+                <div class="p-1.5 bg-green-50 rounded text-green-600">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M7 11l5-5m0 0l5 5m-5-5v12"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <h3 class="text-2xl font-bold text-green-600">
+                {{ dashboardStats.this_month.income_formatted }}
+              </h3>
+            </div>
+
+            <!-- Expense Card -->
+            <div
+              class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex flex-col justify-center"
+            >
+              <div class="flex items-center justify-between mb-1">
+                <p class="text-sm font-medium text-gray-500">
+                  Expense (This Month)
+                </p>
+                <div class="p-1.5 bg-red-50 rounded text-red-600">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M17 13l-5 5m0 0l-5-5m5 5V6"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <h3 class="text-2xl font-bold text-red-600">
+                {{ dashboardStats.this_month.expense_formatted }}
+              </h3>
             </div>
           </div>
+        </div>
+
+        <!-- Charts & Recent Transactions Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          <!-- CHART SECTION -->
           <div
-            class="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-50 rounded-full z-0 opacity-50"
-          ></div>
-        </div>
-
-        <!-- Income -->
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-          <p class="text-sm font-medium text-gray-500 mb-1">
-            Income (This Month)
-          </p>
-          <h3 class="text-3xl font-bold text-green-600">
-            {{ dashboardStats.this_month.income_formatted }}
-          </h3>
-        </div>
-
-        <!-- Expense -->
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-          <p class="text-sm font-medium text-gray-500 mb-1">
-            Expense (This Month)
-          </p>
-          <h3 class="text-3xl font-bold text-red-600">
-            {{ dashboardStats.this_month.expense_formatted }}
-          </h3>
-        </div>
-      </div>
-
-      <!-- Transactions List with Pagination -->
-      <div
-        class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
-      >
-        <div
-          class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50"
-        >
-          <h3 class="text-lg font-bold text-gray-800">All Transactions</h3>
-          <span
-            class="text-xs text-gray-500 bg-white border px-2 py-1 rounded shadow-sm"
+            class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 lg:col-span-1 h-fit"
           >
-            Total: {{ pagination.total }}
-          </span>
-        </div>
-
-        <!-- Table Loading -->
-        <div v-if="loadingTransactions" class="p-12 flex justify-center">
-          <div
-            class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-400"
-          ></div>
-        </div>
-
-        <div v-else>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left">
-              <thead
-                class="bg-gray-50 text-gray-500 text-xs uppercase font-semibold tracking-wider"
-              >
-                <tr>
-                  <th class="px-6 py-3">Date</th>
-                  <th class="px-6 py-3">Description</th>
-                  <th class="px-6 py-3">Category</th>
-                  <th class="px-6 py-3 text-right">Amount</th>
-                  <th class="px-6 py-3 text-center">Action</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-100">
-                <tr
-                  v-for="transaction in transactions"
-                  :key="transaction.id"
-                  class="hover:bg-gray-50 transition"
-                >
-                  <td
-                    class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap font-medium"
-                  >
-                    {{ transaction.date_human }}
-                  </td>
-                  <td class="px-6 py-4 text-sm text-gray-800">
-                    {{ transaction.description || "No description" }}
-                  </td>
-                  <td class="px-6 py-4">
-                    <span
-                      class="px-3 py-1 rounded-full text-xs font-medium flex items-center w-fit gap-1 border border-transparent"
-                      :style="{
-                        backgroundColor:
-                          (transaction.category?.color || '#ccc') + '15',
-                        color: transaction.category?.color || '#666',
-                      }"
-                    >
-                      {{ transaction.category?.name || "Uncategorized" }}
-                    </span>
-                  </td>
-                  <td
-                    class="px-6 py-4 text-sm font-bold text-right whitespace-nowrap"
-                    :class="
-                      transaction.category?.type === 'income'
-                        ? 'text-green-600'
-                        : 'text-red-600'
-                    "
-                  >
-                    {{ transaction.category?.type === "income" ? "+" : "-" }}
-                    {{ transaction.amount_formatted }}
-                  </td>
-                  <td class="px-6 py-4 text-center">
-                    <button
-                      @click="deleteTransaction(transaction.id)"
-                      class="text-gray-400 hover:text-red-500 transition"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                        />
-                      </svg>
-                    </button>
-                  </td>
-                </tr>
-                <tr v-if="transactions.length === 0">
-                  <td
-                    colspan="5"
-                    class="px-6 py-8 text-center text-gray-400 text-sm"
-                  >
-                    No transactions found.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <h3 class="text-lg font-bold text-gray-800 mb-4">
+              Expense Breakdown
+            </h3>
+            <ExpenseChart :raw-api-data="dashboardStats.expense_chart_data" />
           </div>
 
-          <!-- Pagination Controls -->
+          <!-- TRANSACTIONS LIST SECTION -->
           <div
-            v-if="pagination.last_page > 1"
-            class="px-6 py-4 border-t border-gray-100 flex items-center justify-between"
+            class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden lg:col-span-2 flex flex-col h-fit"
           >
-            <button
-              @click="changePage(pagination.current_page - 1)"
-              :disabled="pagination.current_page === 1"
-              class="px-3 py-1 border rounded text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            <div
+              class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50"
             >
-              Previous
-            </button>
-            <span class="text-sm text-gray-500">
-              Page {{ pagination.current_page }} of {{ pagination.last_page }}
-            </span>
-            <button
-              @click="changePage(pagination.current_page + 1)"
-              :disabled="pagination.current_page === pagination.last_page"
-              class="px-3 py-1 border rounded text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Next
-            </button>
+              <h3 class="text-lg font-bold text-gray-800">All Transactions</h3>
+              <span
+                class="text-xs text-gray-500 bg-white border px-2 py-1 rounded shadow-sm"
+              >
+                Total: {{ pagination.total }}
+              </span>
+            </div>
+
+            <!-- Table Loading -->
+            <div v-if="loadingTransactions" class="p-12 flex justify-center">
+              <div
+                class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-400"
+              ></div>
+            </div>
+
+            <div v-else>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                  <thead
+                    class="bg-gray-50 text-gray-500 text-xs uppercase font-semibold tracking-wider"
+                  >
+                    <tr>
+                      <th class="px-6 py-3">Date</th>
+                      <th class="px-6 py-3">Description</th>
+                      <th class="px-6 py-3">Category</th>
+                      <th class="px-6 py-3 text-right">Amount</th>
+                      <th class="px-6 py-3 text-center">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-100">
+                    <tr
+                      v-for="transaction in transactions"
+                      :key="transaction.id"
+                      class="hover:bg-gray-50 transition group"
+                    >
+                      <td
+                        class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap font-medium"
+                      >
+                        {{ transaction.date_human }}
+                      </td>
+                      <td class="px-6 py-4 text-sm text-gray-800">
+                        {{ transaction.description || "No description" }}
+                      </td>
+                      <td class="px-6 py-4">
+                        <span
+                          class="px-3 py-1 rounded-full text-xs font-medium flex items-center w-fit gap-1 border border-transparent"
+                          :style="{
+                            backgroundColor:
+                              (transaction.category?.color || '#ccc') + '15',
+                            color: transaction.category?.color || '#666',
+                          }"
+                        >
+                          {{ transaction.category?.name || "Uncategorized" }}
+                        </span>
+                      </td>
+                      <td
+                        class="px-6 py-4 text-sm font-bold text-right whitespace-nowrap"
+                        :class="
+                          transaction.category?.type === 'income'
+                            ? 'text-green-600'
+                            : 'text-red-600'
+                        "
+                      >
+                        {{
+                          transaction.category?.type === "income" ? "+" : "-"
+                        }}
+                        {{ transaction.amount_formatted }}
+                      </td>
+                      <td class="px-6 py-4 text-center">
+                        <button
+                          @click="deleteTransaction(transaction.id)"
+                          class="text-gray-400 hover:text-red-500 transition p-1 rounded-md hover:bg-red-50 opacity-0 group-hover:opacity-100"
+                          title="Delete Transaction"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr v-if="transactions.length === 0">
+                      <td
+                        colspan="5"
+                        class="px-6 py-8 text-center text-gray-400 text-sm"
+                      >
+                        No transactions found.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Pagination Controls -->
+              <div
+                v-if="pagination.last_page > 1"
+                class="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50"
+              >
+                <button
+                  @click="changePage(pagination.current_page - 1)"
+                  :disabled="pagination.current_page === 1"
+                  class="px-3 py-1 border rounded text-sm text-gray-600 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed bg-white"
+                >
+                  Previous
+                </button>
+                <span class="text-xs text-gray-500 font-medium">
+                  Page {{ pagination.current_page }} of
+                  {{ pagination.last_page }}
+                </span>
+                <button
+                  @click="changePage(pagination.current_page + 1)"
+                  :disabled="pagination.current_page === pagination.last_page"
+                  class="px-3 py-1 border rounded text-sm text-gray-600 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed bg-white"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -246,18 +307,24 @@
               Add New Transaction
             </h3>
             <form @submit.prevent="submitTransaction">
-              <!-- Form Fields -->
               <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 mb-1"
                   >Amount</label
                 >
-                <input
-                  type="number"
-                  v-model="form.amount"
-                  step="0.01"
-                  required
-                  class="w-full border-gray-300 rounded-md border px-3 py-2"
-                />
+                <div class="relative rounded-md shadow-sm">
+                  <div
+                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                  >
+                    <span class="text-gray-500 sm:text-sm">৳</span>
+                  </div>
+                  <input
+                    type="number"
+                    v-model="form.amount"
+                    step="0.01"
+                    required
+                    class="focus:ring-blue-500 focus:border-blue-500 block w-full pl-7 pr-3 sm:text-sm border-gray-300 rounded-md py-2 border"
+                  />
+                </div>
               </div>
               <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 mb-1"
@@ -267,7 +334,7 @@
                   type="date"
                   v-model="form.transaction_date"
                   required
-                  class="w-full border-gray-300 rounded-md border px-3 py-2"
+                  class="w-full border-gray-300 rounded-md border px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
               <div class="mb-4">
@@ -277,7 +344,7 @@
                 <select
                   v-model="form.category_id"
                   required
-                  class="w-full border-gray-300 rounded-md border px-3 py-2 bg-white"
+                  class="w-full border-gray-300 rounded-md border px-3 py-2 bg-white focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="" disabled>Select a category</option>
                   <option
@@ -296,7 +363,7 @@
                 <textarea
                   v-model="form.description"
                   rows="2"
-                  class="w-full border-gray-300 rounded-md border px-3 py-2"
+                  class="w-full border-gray-300 rounded-md border px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
                 ></textarea>
               </div>
               <div
@@ -330,6 +397,7 @@ import { ref, onMounted, reactive } from "vue";
 import { useAuthStore } from "../stores/auth";
 import axios from "../axios";
 import AppNavbar from "../components/AppNavbar.vue";
+import ExpenseChart from "../components/charts/ExpenseChart.vue";
 
 const authStore = useAuthStore();
 const dashboardStats = ref(null);
@@ -353,7 +421,7 @@ const form = reactive({
   description: "",
 });
 
-// 1. Fetch Stats Only
+// 1. Fetch Dashboard Stats (Balance, Income/Expense, Chart Data)
 const fetchStats = async () => {
   loadingStats.value = true;
   try {
@@ -366,17 +434,14 @@ const fetchStats = async () => {
   }
 };
 
-// 2. Fetch Paginated Transactions (Updated Logic)
+// 2. Fetch Paginated Transactions List
 const fetchTransactions = async (page = 1) => {
   loadingTransactions.value = true;
   try {
-    console.log(`Fetching Transactions (Page ${page})...`);
     const response = await axios.get(`/transactions?page=${page}`);
-
-    console.log("Transactions Response:", response.data);
-
     transactions.value = response.data.data || [];
 
+    // Set Pagination Data
     if (response.data.meta) {
       pagination.value = {
         current_page: response.data.meta.current_page,
@@ -391,25 +456,20 @@ const fetchTransactions = async (page = 1) => {
       };
     }
   } catch (error) {
-    console.error("Transactions Fetch Error:", error);
-    if (error.response)
-      console.error(
-        "Server responded with:",
-        error.response.status,
-        error.response.data
-      );
+    console.error("Transactions Error:", error);
   } finally {
     loadingTransactions.value = false;
   }
 };
 
-// Pagination Click Handler
+// Handle Page Change
 const changePage = (page) => {
   if (page > 0 && page <= pagination.value.last_page) {
     fetchTransactions(page);
   }
 };
 
+// Fetch Categories for Modal
 const fetchCategories = async () => {
   try {
     const response = await axios.get("/categories");
@@ -441,6 +501,7 @@ const submitTransaction = async () => {
   try {
     await axios.post("/transactions", form);
     closeModal();
+    // Refresh data after successful add
     fetchStats();
     fetchTransactions(1);
   } catch (error) {
@@ -451,7 +512,7 @@ const submitTransaction = async () => {
 };
 
 const deleteTransaction = async (id) => {
-  if (!confirm("Are you sure?")) return;
+  if (!confirm("Are you sure you want to delete this transaction?")) return;
   try {
     await axios.delete(`/transactions/${id}`);
     fetchStats();
