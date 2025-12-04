@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import Login from '../views/Login.vue';
+import Dashboard from '../views/Dashboard.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -10,12 +11,12 @@ const router = createRouter({
             name: 'login',
             component: Login
         },
-        // {
-        //     path: '/',
-        //     name: 'dashboard',
-        //     component: () => import('../views/Dashboard.vue'),
-        //     meta: { requiresAuth: true }
-        // }
+        {
+            path: '/',
+            name: 'dashboard',
+            component: Dashboard,
+            meta: { requiresAuth: true }
+        }
     ]
 });
 
