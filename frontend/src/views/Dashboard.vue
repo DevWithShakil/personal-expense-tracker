@@ -27,27 +27,52 @@
     </AppNavbar>
 
     <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <!-- Loading State -->
+      <!-- HEADER & FILTER SECTION -->
       <div
-        v-if="loadingStats"
-        class="flex justify-center items-center h-32 mb-8"
+        class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4"
       >
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800">Dashboard</h2>
+          <p v-if="dashboardStats" class="text-sm text-gray-500 mt-1">
+            Overview for
+            <span class="font-semibold text-blue-600">{{
+              dashboardStats.selected_month.name
+            }}</span>
+          </p>
+        </div>
+
+        <!-- Month Picker Input -->
         <div
-          class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+          class="flex items-center gap-2 bg-white p-2 rounded-lg shadow-sm border border-gray-200"
+        >
+          <label class="text-sm text-gray-500 font-medium pl-2">Filter:</label>
+          <input
+            type="month"
+            v-model="filterDate"
+            @change="handleFilterChange"
+            class="border-none focus:ring-0 text-sm font-medium text-gray-700 bg-transparent cursor-pointer outline-none"
+          />
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div v-if="loadingStats" class="flex justify-center items-center h-64">
+        <div
+          class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"
         ></div>
       </div>
 
       <!-- Dashboard Content -->
       <div v-else-if="dashboardStats">
-        <!-- Top Stats Row -->
+        <!-- TOP STATS CARDS -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <!-- Total Balance Card -->
+          <!-- Total Balance (Always Overall) -->
           <div
             class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 relative overflow-hidden md:col-span-1"
           >
             <div class="relative z-10">
               <p class="text-sm font-medium text-gray-500 mb-1">
-                Total Balance
+                Total Balance (Overall)
               </p>
               <h3 class="text-3xl font-bold text-gray-800">
                 {{ dashboardStats.balance.formatted }}
@@ -74,16 +99,14 @@
             ></div>
           </div>
 
-          <!-- Income & Expense Summary -->
+          <!-- Income & Expense (Selected Month) -->
           <div class="md:col-span-2 grid grid-cols-2 gap-4">
             <!-- Income Card -->
             <div
               class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex flex-col justify-center"
             >
               <div class="flex items-center justify-between mb-1">
-                <p class="text-sm font-medium text-gray-500">
-                  Income (This Month)
-                </p>
+                <p class="text-sm font-medium text-gray-500">Income</p>
                 <div class="p-1.5 bg-green-50 rounded text-green-600">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -102,7 +125,7 @@
                 </div>
               </div>
               <h3 class="text-2xl font-bold text-green-600">
-                {{ dashboardStats.this_month.income_formatted }}
+                {{ dashboardStats.selected_month.income_formatted }}
               </h3>
             </div>
 
@@ -111,9 +134,7 @@
               class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex flex-col justify-center"
             >
               <div class="flex items-center justify-between mb-1">
-                <p class="text-sm font-medium text-gray-500">
-                  Expense (This Month)
-                </p>
+                <p class="text-sm font-medium text-gray-500">Expense</p>
                 <div class="p-1.5 bg-red-50 rounded text-red-600">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -132,13 +153,13 @@
                 </div>
               </div>
               <h3 class="text-2xl font-bold text-red-600">
-                {{ dashboardStats.this_month.expense_formatted }}
+                {{ dashboardStats.selected_month.expense_formatted }}
               </h3>
             </div>
           </div>
         </div>
 
-        <!-- CHARTS ROW (Income + Expense) -->
+        <!-- CHARTS SECTION -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           <!-- Income Chart -->
           <div
@@ -171,14 +192,14 @@
           </div>
         </div>
 
-        <!-- TRANSACTIONS LIST SECTION (Full Width) -->
+        <!-- TRANSACTIONS LIST SECTION -->
         <div
           class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-fit mb-8"
         >
           <div
             class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50"
           >
-            <h3 class="text-lg font-bold text-gray-800">All Transactions</h3>
+            <h3 class="text-lg font-bold text-gray-800">Transactions</h3>
             <span
               class="text-xs text-gray-500 bg-white border px-2 py-1 rounded shadow-sm"
             >
@@ -272,14 +293,14 @@
                       colspan="5"
                       class="px-6 py-8 text-center text-gray-400 text-sm"
                     >
-                      No transactions found.
+                      No transactions found for this month.
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
 
-            <!-- Pagination Controls -->
+            <!-- Pagination -->
             <div
               v-if="pagination.last_page > 1"
               class="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50"
@@ -415,22 +436,20 @@ import { useAuthStore } from "../stores/auth";
 import axios from "../axios";
 import AppNavbar from "../components/AppNavbar.vue";
 import ExpenseChart from "../components/charts/ExpenseChart.vue";
-import IncomeChart from "../components/charts/IncomeChart.vue"; // <--- Import New Component
+import IncomeChart from "../components/charts/IncomeChart.vue";
 
 const authStore = useAuthStore();
 const dashboardStats = ref(null);
 const transactions = ref([]);
-const pagination = ref({
-  current_page: 1,
-  last_page: 1,
-  total: 0,
-});
-
+const pagination = ref({ current_page: 1, last_page: 1, total: 0 });
 const loadingStats = ref(true);
 const loadingTransactions = ref(true);
 const categories = ref([]);
 const showModal = ref(false);
 const submitting = ref(false);
+
+// Date Filter State (YYYY-MM format)
+const filterDate = ref(new Date().toISOString().slice(0, 7));
 
 const form = reactive({
   amount: "",
@@ -439,11 +458,17 @@ const form = reactive({
   description: "",
 });
 
-// 1. Fetch Dashboard Stats
+// Helper to get year/month from filterDate string
+const getFilterParams = () => {
+  const [year, month] = filterDate.value.split("-");
+  return { year, month };
+};
+
 const fetchStats = async () => {
   loadingStats.value = true;
   try {
-    const response = await axios.get("/dashboard");
+    const params = getFilterParams();
+    const response = await axios.get("/dashboard", { params });
     dashboardStats.value = response.data;
   } catch (error) {
     console.error("Stats Error:", error);
@@ -452,14 +477,16 @@ const fetchStats = async () => {
   }
 };
 
-// 2. Fetch Paginated Transactions List
 const fetchTransactions = async (page = 1) => {
   loadingTransactions.value = true;
   try {
-    const response = await axios.get(`/transactions?page=${page}`);
+    const { year, month } = getFilterParams();
+    // Send month/year params to transaction list too
+    const response = await axios.get(
+      `/transactions?page=${page}&year=${year}&month=${month}`
+    );
     transactions.value = response.data.data || [];
 
-    // Set Pagination Data
     if (response.data.meta) {
       pagination.value = {
         current_page: response.data.meta.current_page,
@@ -480,14 +507,18 @@ const fetchTransactions = async (page = 1) => {
   }
 };
 
-// Handle Page Change
+// Called when user changes the month input
+const handleFilterChange = () => {
+  fetchStats();
+  fetchTransactions(1); // Reset to page 1 on filter change
+};
+
 const changePage = (page) => {
   if (page > 0 && page <= pagination.value.last_page) {
     fetchTransactions(page);
   }
 };
 
-// Fetch Categories for Modal
 const fetchCategories = async () => {
   try {
     const response = await axios.get("/categories");
@@ -519,7 +550,7 @@ const submitTransaction = async () => {
   try {
     await axios.post("/transactions", form);
     closeModal();
-    // Refresh data after successful add
+    // Refresh stats and list
     fetchStats();
     fetchTransactions(1);
   } catch (error) {
@@ -530,7 +561,7 @@ const submitTransaction = async () => {
 };
 
 const deleteTransaction = async (id) => {
-  if (!confirm("Are you sure you want to delete this transaction?")) return;
+  if (!confirm("Are you sure?")) return;
   try {
     await axios.delete(`/transactions/${id}`);
     fetchStats();

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\TransactionResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -13,26 +14,34 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        $startOfMonth = now()->startOfMonth();
-        $endOfMonth = now()->endOfMonth();
+        $year = $request->input('year', now()->year);
+        $month = $request->input('month', now()->month);
 
-        // 1. Balances
+        $startDate = Carbon::createFromDate($year, $month, 1)->startOfMonth();
+        $endDate = Carbon::createFromDate($year, $month, 1)->endOfMonth();
+
+
         $totalIncome = $user->transactions()->whereHas('category', fn($q) => $q->where('type', 'income'))->sum('amount');
         $totalExpense = $user->transactions()->whereHas('category', fn($q) => $q->where('type', 'expense'))->sum('amount');
         $balance = $totalIncome - $totalExpense;
 
-        // 2. This Month
-        $thisMonthIncome = $user->transactions()->whereBetween('transaction_date', [$startOfMonth, $endOfMonth])->whereHas('category', fn($q) => $q->where('type', 'income'))->sum('amount');
-        $thisMonthExpense = $user->transactions()->whereBetween('transaction_date', [$startOfMonth, $endOfMonth])->whereHas('category', fn($q) => $q->where('type', 'expense'))->sum('amount');
+        // 4. Selected Month Summary (This Month / Filtered Month)
+        $monthIncome = $user->transactions()
+            ->whereBetween('transaction_date', [$startDate, $endDate])
+            ->whereHas('category', fn($q) => $q->where('type', 'income'))
+            ->sum('amount');
 
-        // 3. Recent Transactions
+        $monthExpense = $user->transactions()
+            ->whereBetween('transaction_date', [$startDate, $endDate])
+            ->whereHas('category', fn($q) => $q->where('type', 'expense'))
+            ->sum('amount');
+
+        // 5. Recent Transactions
         $recentTransactions = $user->transactions()->with('category')->latest('transaction_date')->limit(5)->get();
 
-        // 4. Expense Chart Data
-        $expenseChart = $this->getChartData($user, 'expense', $startOfMonth, $endOfMonth);
-
-        // 5. Income Chart Data
-        $incomeChart = $this->getChartData($user, 'income', $startOfMonth, $endOfMonth);
+        // 6. Chart Data (Filtered by Date)
+        $expenseChart = $this->getChartData($user, 'expense', $startDate, $endDate);
+        $incomeChart = $this->getChartData($user, 'income', $startDate, $endDate);
 
         return response()->json([
             'balance' => [
@@ -40,11 +49,12 @@ class DashboardController extends Controller
                 'formatted' => '৳' . number_format($balance, 2),
                 'status' => $balance >= 0 ? 'positive' : 'negative'
             ],
-            'this_month' => [
-                'income' => number_format($thisMonthIncome, 2, '.', ''),
-                'income_formatted' => '৳' . number_format($thisMonthIncome, 2),
-                'expense' => number_format($thisMonthExpense, 2, '.', ''),
-                'expense_formatted' => '৳' . number_format($thisMonthExpense, 2),
+            'selected_month' => [
+                'name' => $startDate->format('F Y'),
+                'income' => number_format($monthIncome, 2, '.', ''),
+                'income_formatted' => '৳' . number_format($monthIncome, 2),
+                'expense' => number_format($monthExpense, 2, '.', ''),
+                'expense_formatted' => '৳' . number_format($monthExpense, 2),
             ],
             'recent_transactions' => TransactionResource::collection($recentTransactions),
             'expense_chart_data' => $expenseChart,
@@ -52,7 +62,6 @@ class DashboardController extends Controller
         ]);
     }
 
-    // Helper function to avoid duplicate code
     private function getChartData($user, $type, $start, $end)
     {
         return $user->transactions()
