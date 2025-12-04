@@ -3,6 +3,7 @@ import { useAuthStore } from '../stores/auth';
 import Login from '../views/Login.vue';
 import Dashboard from '../views/Dashboard.vue';
 import Categories from '../views/Categories.vue';
+import Settings from '../views/Settings.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,7 +25,14 @@ const router = createRouter({
             name: 'categories',
             component: Categories,
             meta: { requiresAuth: true }
-        }
+        },
+
+        {
+            path: '/settings',
+            name: 'settings',
+            component: Settings,
+            meta: { requiresAuth: true }
+        },
     ]
 });
 

@@ -50,6 +50,18 @@
             >
               Categories
             </router-link>
+            <!-- Settings Link Added Here -->
+            <router-link
+              to="/settings"
+              class="px-3 py-2 rounded-md text-sm font-medium transition"
+              :class="
+                $route.path === '/settings'
+                  ? 'bg-blue-50 text-blue-700'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              "
+            >
+              Settings
+            </router-link>
           </div>
         </div>
 

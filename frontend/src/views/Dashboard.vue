@@ -106,8 +106,9 @@
               <p class="text-sm font-medium text-gray-500 mb-1">
                 Total Balance (Overall)
               </p>
+              <!-- Dynamic Currency Update -->
               <h3 class="text-3xl font-bold text-gray-800">
-                {{ dashboardStats.balance.formatted }}
+                {{ currencySymbol }} {{ dashboardStats.balance.total }}
               </h3>
               <div class="mt-4 flex items-center text-sm">
                 <span
@@ -156,8 +157,9 @@
                   </svg>
                 </div>
               </div>
+              <!-- Dynamic Currency Update -->
               <h3 class="text-2xl font-bold text-green-600">
-                {{ dashboardStats.selected_month.income_formatted }}
+                {{ currencySymbol }} {{ dashboardStats.selected_month.income }}
               </h3>
             </div>
 
@@ -184,8 +186,9 @@
                   </svg>
                 </div>
               </div>
+              <!-- Dynamic Currency Update -->
               <h3 class="text-2xl font-bold text-red-600">
-                {{ dashboardStats.selected_month.expense_formatted }}
+                {{ currencySymbol }} {{ dashboardStats.selected_month.expense }}
               </h3>
             </div>
           </div>
@@ -346,8 +349,9 @@
                           : 'text-red-600'
                       "
                     >
+                      <!-- Dynamic Currency in Table -->
                       {{ transaction.category?.type === "income" ? "+" : "-" }}
-                      {{ transaction.amount_formatted }}
+                      {{ currencySymbol }} {{ transaction.amount }}
                     </td>
                     <td class="px-6 py-4 text-center">
                       <div
@@ -482,7 +486,10 @@
                   <div
                     class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
                   >
-                    <span class="text-gray-500 sm:text-sm">৳</span>
+                    <!-- Dynamic Currency Symbol in Modal -->
+                    <span class="text-gray-500 sm:text-sm">{{
+                      currencySymbol
+                    }}</span>
                   </div>
                   <input
                     type="number"
@@ -560,7 +567,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from "vue";
+import { ref, onMounted, reactive, computed } from "vue";
 import { useAuthStore } from "../stores/auth";
 import axios from "../axios";
 import AppNavbar from "../components/AppNavbar.vue";
@@ -595,13 +602,29 @@ const form = reactive({
   description: "",
 });
 
+// Smarter Currency Computed Property
+// ব্যাকএন্ডের রেসপন্সের উপর নির্ভর না করে সরাসরি Auth Store থেকে কারেন্সি চেক করছে
+const currencySymbol = computed(() => {
+  const currency = authStore.user?.currency || "BDT";
+  switch (currency) {
+    case "USD":
+      return "$";
+    case "EUR":
+      return "€";
+    case "BDT":
+      return "৳";
+    default:
+      return "৳";
+  }
+});
+
 // Helper: Extract Year/Month
 const getFilterParams = () => {
   const [year, month] = filterDate.value.split("-");
   return { year, month };
 };
 
-// 1. Fetch Stats (Balance, Charts)
+// 1. Fetch Stats
 const fetchStats = async () => {
   loadingStats.value = true;
   try {
@@ -615,7 +638,7 @@ const fetchStats = async () => {
   }
 };
 
-// 2. Fetch Transactions List with Filters
+// 2. Fetch Transactions List
 const fetchTransactions = async (page = 1) => {
   loadingTransactions.value = true;
   try {

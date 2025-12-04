@@ -15,6 +15,13 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
+        $currencySymbol = match($user->currency) {
+            'USD' => '$',
+            'EUR' => '€',
+            'BDT' => '৳',
+            default => '৳',
+        };
+
         $year = $request->input('year', now()->year);
         $month = $request->input('month', now()->month);
 
