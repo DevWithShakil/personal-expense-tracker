@@ -18,21 +18,21 @@ class TransactionController extends Controller
                     ->transactions()
                     ->with('category');
 
-        if($request->hash('month')){
+        if($request->has('month')){
             $query->whereMonth('transaction_date', $request->month);
         }
 
-        if($request->hash('year')){
+        if($request->has('year')){
             $query->whereMonth('transaction_date', $request->year);
         }
 
-        if($request->hash('type')){
+        if($request->has('type')){
             $query->where('category', function($q) use ($request){
                 $q->where('type', $request->type);
             });
         }
 
-        $transactions = $query->latest('transaction_date')->paginate(20);
+        $transactions = $query->latest('transaction_date')->paginate(10);
         return TransactionResource::collection($transactions);
     }
 
