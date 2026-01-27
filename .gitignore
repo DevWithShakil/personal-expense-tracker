@@ -11,7 +11,7 @@ Thumbs.db
 # BACKEND (Laravel)
 # -----------------------------
 Backend/node_modules
-Backend/public/build
+# Backend/public/build
 Backend/public/hot
 Backend/public/storage
 Backend/storage/*.key
